@@ -19,7 +19,7 @@ enum class GameMode(
         "/Data",
         "starfield-mods",
         "starfield",
-        { modGamePath, useMyDocs -> (if (useMyDocs && modGamePath.startsWith("Data", true)) PathType.INI else PathType.APP_DATA).let { gameMode.path(it)!! } },
+        { modGamePath, useMyDocs -> (if (useMyDocs && modGamePath.startsWith("Data", true)) PathType.APP_DATA else PathType.GAME).let { gameMode.path(it)!! } },
         starfieldPaths(),
     ),
     OBLIVION_REMASTERED(
