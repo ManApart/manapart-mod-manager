@@ -4,7 +4,7 @@
 
 Flexible CLI commands support everything from Nexus download links to bulk updating mods, to maintaining and deploying local mod collections.
 
-![Demo](demo.gif)
+![Demo](demo.svg)
 
 View more info and demos at the docs site:
 
