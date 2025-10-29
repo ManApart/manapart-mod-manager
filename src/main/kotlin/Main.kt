@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
+import java.util.Locale
 
 lateinit var toolData: Data
 lateinit var toolConfig: MainConfig
@@ -133,3 +134,5 @@ fun confirm(skip: Boolean = false, warnMessage: String? = null, block: () -> Uni
         }
     }
 }
+
+fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }

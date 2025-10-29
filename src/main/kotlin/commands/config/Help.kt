@@ -2,6 +2,7 @@ package commands.config
 
 import Column
 import Table
+import capitalize
 import commands.CommandType
 import commands.getCommand
 import cyan

@@ -3,6 +3,7 @@ package commands.view
 import Column
 import Mod
 import Table
+import capitalize
 import commands.getIndicesOrRange
 import toolData
 
