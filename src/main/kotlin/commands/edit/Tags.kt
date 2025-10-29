@@ -16,12 +16,14 @@ enum class Tag(val tag: String) {
 
 val tagDescription = """
 Add and remove tags
+tag ls - Lists all tags and number of mods using that tag
 """.trimIndent()
 
 val tagUsage = """
    tag 1 add essential
    tag 1 rm essential
    tag 1 rm 0
+   tag ls
 """.trimIndent()
 
 fun tag(command: String, args: List<String>) {
@@ -30,7 +32,7 @@ fun tag(command: String, args: List<String>) {
     val subCommand = args.getOrNull(1)?.replace("rm", "remove")
     val tagArg = args.getOrNull(2)
     when {
-        args.isEmpty() -> println(tagDescription)
+        args.isEmpty() || args.first() == "ls" -> printTags()
         mod == null -> println("Must provide the index of a valid mod to update")
         subCommand == "add" -> addTag(mod, tagArg)
         subCommand == "remove" && tagArg?.toIntOrNull() != null -> removeTag(mod, tagArg.toInt())
@@ -38,6 +40,14 @@ fun tag(command: String, args: List<String>) {
 
         else -> println("Unknown args: ${args.joinToString(" ")}")
     }
+}
+
+private fun printTags() {
+    val tags = toolData.mods.flatMap { it.tags }.groupBy { it }
+    if (tags.isEmpty()) {
+        println("No tags")
+    }
+    println(tags.entries.joinToString("\n") { (key, amount) -> "$key (${amount.size})" })
 }
 
 private fun addTag(mod: Mod, tag: String?) {

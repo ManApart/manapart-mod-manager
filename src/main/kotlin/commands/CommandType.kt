@@ -51,7 +51,7 @@ enum class CommandType(
     SEARCH("Search Mods", Category.VIEW, searchDescription, searchModsUsage, ::searchMods, "grep", "awk"),
     SORT("Sort Mods", Category.VIEW, sortDescription, sortUsage, ::sortMods, "s"),
     START("Launch Starfield", Category.CONFIG, startGameDescription, startGameUsage, ::startGame, "game"),
-    TAG("Edit tags on a mod", Category.EDIT, tagDescription, tagUsage, ::tag, "t"),
+    TAG("Edit tags on a mod", Category.EDIT, tagDescription, tagUsage, ::tag, "t", "tags"),
     UPDATE("Check for newer versions", Category.UPDATE, updateDescription, updateUsage, ::update, "up"),
     UPGRADE("Upgrade to newer versions", Category.UPDATE, upgradeDescription, upgradeUsage, ::upgrade, "ug"),
     VALIDATE("List issues with mods", Category.DEPLOY, validateDescription, validateUsage, ::validateMods, "v"),
