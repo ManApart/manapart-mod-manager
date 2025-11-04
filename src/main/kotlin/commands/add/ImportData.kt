@@ -30,17 +30,21 @@ fun importData(command: String, args: List<String> = listOf()) {
     if (changes != null) {
         with(changes) {
             println("${adds.size} adds, ${deletes.size} deletes and ${tagsAdded.size + tagsRemoved.size} tag updates")
+
+            (deletes + tagsRemoved.keys + tagsAdded.keys).toSet().map { it to toolData.byUniqueId(it, true) }.filter { it.second == null }.takeIf { it.isNotEmpty() }?.let { missing -> println("Missing ids: ${missing.joinToString{it.first}}") }
+
             if (adds.isNotEmpty()) fetchModsById(adds)
 
-            deletes.mapNotNull { toolData.byUniqueId(it) }.forEach { mod ->
+            deletes.mapNotNull { toolData.byUniqueId(it, true) }.forEach { mod ->
                 if (mod.hasTag(Tag.CREATION)) rmCreation(mod, true) else delete(mod)
             }
 
             tagsRemoved.forEach { (id, tags) ->
-                toolData.byUniqueId(id)?.tags?.removeAll(tags.toSet())
+                toolData.byUniqueId(id, true)?.tags?.removeAll(tags.toSet())
             }
+
             tagsAdded.forEach { (id, tags) ->
-                toolData.byUniqueId(id)?.tags?.addAll(tags)
+                toolData.byUniqueId(id, true)?.tags?.addAll(tags)
             }
             println(cyan("Import complete"))
         }

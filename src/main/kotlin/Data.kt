@@ -13,10 +13,10 @@ data class Data(
 ) {
     fun byId(id: Int) = mods.firstOrNull { it.id == id }
     fun byCreationId(id: String) = mods.firstOrNull { it.creationId == id }
-    fun byIndex(i: Int) = mods.getOrNull(i).also { if (it == null) println("No Mod found for $i") }
+    fun byIndex(i: Int, silent: Boolean = false) = mods.getOrNull(i).also { if (it == null && !silent) println("No Mod found for $i") }
     fun byName(name: String, silent: Boolean = false) = mods.firstOrNull { it.name == name }.also { if (it == null && !silent) println("No Mod found for $name") }
-    fun byFilePath(path: String) = mods.firstOrNull { it.filePath == path }.also { if (it == null) println("No Mod found for $path") }
-    fun byUniqueId(id: String) = id.toIntOrNull()?.let { byId(it) } ?: byFilePath(id) ?: byName(id, true)
+    fun byFilePath(path: String, silent: Boolean = false) = mods.firstOrNull { it.filePath == path }.also { if (it == null && !silent) println("No Mod found for $path") }
+    fun byUniqueId(id: String, silent: Boolean = false) = (id.toIntOrNull()?.let { byId(it) } ?: byFilePath(id, true) ?: byName(id, true)).also { if (it == null && !silent) println("No mod found for $id") }
     fun nextLoadOrder() = (mods.maxOfOrNull { it.loadOrder } ?: -1) + 1
     fun updateSorts() = toolData.mods.forEachIndexed { i, mod -> mod.index = i }
 
