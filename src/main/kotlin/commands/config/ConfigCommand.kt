@@ -19,7 +19,8 @@ val configDescription = """
     verbose gives additional output (for debugging) if set to true
     autodeploy automatically runs deploy when enabling or disabling mods. Defaults to true
     use-my-docs optionally allows deploying mod files under Data to my documents instead of the game folder. (Defaults to false) 
-    categories is used to download category names from nexus
+    logging - log events like launch (and load order) or first time fetching a mod etc, on by default
+    categories - download game specific category names from nexus
     config path is used to set game specific paths
     config paths tells you what paths are needed
     If your paths have spaces, make sure to quote them
@@ -34,6 +35,7 @@ val configUsage = """
     |config verbose <true/false>
     |config autodeploy <true/false>
     |config use-my-docs <true/false> 
+    |config logging <true/false>
     |config categories
     |config version
 """.trimMargin()

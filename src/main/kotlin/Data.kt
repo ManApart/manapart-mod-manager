@@ -1,5 +1,6 @@
-import kotlinx.serialization.Serializable
 import nexus.ModInfo
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
 @Serializable
 data class Profile(val name: String, var ids: List<Int>, var filePaths: List<String>) {

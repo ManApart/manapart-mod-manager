@@ -9,6 +9,7 @@ data class MainConfig(
     var useMyDocs: Boolean = false,
     var verbose: Boolean = false,
     var autoDeploy: Boolean = true,
+    var logging: Boolean = true,
     var openInTerminalCommand: String? = null,
 )
 

@@ -1,6 +1,7 @@
 package commands.config
 
 import gameMode
+import logLaunch
 import runCommand
 import java.io.File
 
@@ -13,5 +14,6 @@ val startGameUsage = """
 """.trimIndent()
 
 fun startGame(command: String, args: List<String>) {
+    logLaunch()
     File(".").runCommand("steam steam://rungameid/${gameMode.steamId}", true)
 }
