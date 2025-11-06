@@ -23,5 +23,5 @@ sealed class LogEvent {
 
     @Serializable
     @SerialName("delete")
-    data class DeleteEvent(override val at: LocalDateTime, val id: Int?, val name: String) : LogEvent()
+    data class DeleteEvent(override val at: LocalDateTime, val id: Int? = null, val name: String) : LogEvent()
 }

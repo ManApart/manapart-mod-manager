@@ -47,7 +47,7 @@ enum class CommandType(
     PROFILE("Create and use local mod lists", Category.DEPLOY, profileDescription, profileUsage, ::profile, "p", "prof"),
     RENAME("Rename a mod", Category.EDIT, renameHelp, "rename <index> <new name>", ::moveMod, "mv"),
     REFRESH("Refresh mods by id", Category.UPDATE, refreshDescription, refreshUsage, ::refresh, "rr"),
-    REMOVE("Delete a mod", Category.ADD, removeHelp, removeDescription, ::remove, "rm"),
+    REMOVE("Delete a mod", Category.ADD, removeHelp, removeDescription, ::remove, "rm", "delete"),
     SEARCH("Search Mods", Category.VIEW, searchDescription, searchModsUsage, ::searchMods, "grep", "awk"),
     SORT("Sort Mods", Category.VIEW, sortDescription, sortUsage, ::sortMods, "s"),
     START("Launch Starfield", Category.CONFIG, startGameDescription, startGameUsage, ::startGame, "game"),
