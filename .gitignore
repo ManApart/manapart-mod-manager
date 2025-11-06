@@ -58,3 +58,4 @@ test/
 oblivion-remastered-mods/
 starfield-mods/
 *.jsonl
+*-hashes.json
