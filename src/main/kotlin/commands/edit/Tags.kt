@@ -57,6 +57,7 @@ private fun addTag(mod: Mod, tag: String?) {
     }
     mod.tags.add(tag)
     save()
+    println("Added $tag to ${mod.name}")
 }
 
 private fun removeTag(mod: Mod, tagId: Int) = removeTag(mod, mod.tags.elementAt(tagId))
@@ -69,5 +70,6 @@ private fun removeTag(mod: Mod, tag: String) {
     confirm(false, yellow("Remove tag $tag? ")) {
         mod.tags.remove(tag)
         save()
+        println("Removed $tag from ${mod.name}")
     }
 }

@@ -14,6 +14,7 @@ import java.nio.file.Files
 import GamePath.*
 import commands.edit.Tag
 import commands.deploy.espTypes
+import logFetch
 
 private val ignoredExternalPlugins = listOf("Starfield", "OldMars", "Constellation", "BlueprintShips-Starfield", "SFBGS003", "SFBGS006", "SFBGS007", "SFBGS008")
 
@@ -92,7 +93,7 @@ fun addExternal(esp: String, name: String? = null) {
         toolData.mods.add(it)
         save()
     }
-
+    logFetch(mod.name)
     println("Added (${mod.index}) ${mod.name}")
 }
 

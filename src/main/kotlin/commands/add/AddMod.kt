@@ -4,6 +4,9 @@ import addModByFile
 import addModById
 import addModByNexusProtocol
 import cyan
+import io.ktor.server.util.url
+import logFetch
+import red
 import urlToId
 
 val addModDescription = """
@@ -42,13 +45,14 @@ fun addMod(command: String, args: List<String>) {
 }
 
 private fun addModByUrls(urls: List<String>) {
-    urls.forEach { url ->
-        url.urlToId()?.let { addModById(it) }
-    }
+    val ids = urls.mapNotNull { url -> url.urlToId().also { if (it == null) println(red("Could not find id for $url")) } }
+    ids.forEach { addModById(it) }
+    logFetch(ids)
     println(cyan("Done adding"))
 }
 
-private fun addModByIds(ids: List<Int>){
+private fun addModByIds(ids: List<Int>) {
     ids.forEach { addModById(it) }
+    logFetch(ids)
     println(cyan("Done adding"))
 }

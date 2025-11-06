@@ -19,10 +19,9 @@ sealed class LogEvent {
 
     @Serializable
     @SerialName("fetch")
-    data class FetchEvent(override val at: LocalDateTime, val ids: List<Int> = emptyList()) : LogEvent()
+    data class FetchEvent(override val at: LocalDateTime, val ids: List<Int> = emptyList(), val names: List<String> = emptyList()) : LogEvent()
 
     @Serializable
     @SerialName("delete")
-    data class DeleteEvent(override val at: LocalDateTime, val ids: List<Int> = emptyList(), val names: List<Int> = emptyList()) : LogEvent()
-
+    data class DeleteEvent(override val at: LocalDateTime, val ids: List<Int> = emptyList(), val names: List<String> = emptyList()) : LogEvent()
 }

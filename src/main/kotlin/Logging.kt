@@ -11,6 +11,21 @@ val jsonLogMapper = kotlinx.serialization.json.Json {
     prettyPrint = false
 }
 
+fun logFetch(name: String) {
+    if (!toolConfig.logging) return
+    logEvent(LogEvent.FetchEvent(now(), names = listOf(name)))
+}
+
+fun logFetch(ids: List<Int>) {
+    if (!toolConfig.logging) return
+    logEvent(LogEvent.FetchEvent(now(), ids))
+}
+
+fun logDelete(ids: List<Int>, names: List<String>) {
+    if (!toolConfig.logging) return
+    logEvent(LogEvent.DeleteEvent(now(), ids, names))
+}
+
 fun logLaunch() {
     if (!toolConfig.logging) return
     val (modIds, modNames) = toolData.mods.filter { it.enabled }.partition { it.id != null }

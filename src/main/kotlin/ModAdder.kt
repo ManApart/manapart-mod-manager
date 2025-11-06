@@ -5,7 +5,7 @@ import kotlin.math.max
 
 fun addModById(id: Int, fileId: Int? = null, forceRedownload: Boolean = false) {
     val existing = toolData.byId(id)
-    if (existing != null){
+    if (existing != null) {
         println("Mod already exists. Refreshing...")
         refreshMod(existing, forceRedownload, fileId)
         return
@@ -135,6 +135,7 @@ fun addModByNexusProtocol(url: String) {
         println(red("Failed to download ${mod.name}"))
     } else {
         addModFile(mod, downloaded, modName)
+        logFetch(listOf(request.modId))
     }
 }
 
@@ -154,6 +155,7 @@ fun addModByFile(filePath: String, nameOverride: String?) {
     }
 
     addModFile(mod, sourceFile, name)
+    logFetch(name)
 }
 
 fun addModFile(mod: Mod, sourceFile: File, modName: String, version: String? = mod.latestVersion) {

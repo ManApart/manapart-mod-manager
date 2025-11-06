@@ -26,6 +26,7 @@ import commands.edit.Tag
 import commands.deploy.deleteLink
 import commands.deploy.espTypes
 import gameMode
+import logFetch
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -141,10 +142,11 @@ private fun addAllCreations(force: Boolean = false) {
     }
 }
 
-fun addCreation(creationId: String) {
+fun addCreation(creationId: String): Creation? {
     val creations = parseCreationCatalog()
-    val creation: Creation? = creations[creationId] ?: creations.values.firstOrNull { it.modFileId?.lowercase() == creationId.lowercase() }
+    val creation: Creation? = creations[creationId] ?: creations.values.firstOrNull { it.modFileId.equals(creationId, ignoreCase = true) }
     creation?.let { addCreation(it) }
+    return creation
 }
 
 fun addCreation(creation: Creation) {
@@ -190,6 +192,7 @@ fun addCreation(creation: Creation) {
         println("Updated (${mod.index}) ${mod.name}")
     } else {
         println("Added (${mod.index}) ${mod.name}")
+        logFetch(mod.creationId ?: mod.name)
     }
 }
 
