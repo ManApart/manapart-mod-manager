@@ -21,9 +21,9 @@ fun logFetch(ids: List<Int>) {
     logEvent(LogEvent.FetchEvent(now(), ids))
 }
 
-fun logDelete(ids: List<Int>, names: List<String>) {
+fun logDelete(id: Int?, name: String) {
     if (!toolConfig.logging) return
-    logEvent(LogEvent.DeleteEvent(now(), ids, names))
+    logEvent(LogEvent.DeleteEvent(now(), id, name))
 }
 
 fun logLaunch() {

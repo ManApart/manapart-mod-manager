@@ -3,6 +3,7 @@ package commands.add
 import Mod
 import commands.edit.Tag
 import confirm
+import logDelete
 import red
 import save
 import toolData
@@ -39,12 +40,12 @@ private fun removeMod(index: Int) {
 }
 
 fun delete(mod: Mod) {
-    val desc = mod.name
     val existing = File(mod.filePath)
     if (existing.exists()) existing.deleteRecursively()
     toolData.mods.remove(mod)
     toolData.mods.filter { it.loadOrder > mod.loadOrder }.map { it.loadOrder -= 1 }
     toolData.mods.filter { it.index > mod.index }.map { it.index -= 1 }
     save()
-    println(red("Mod '$desc' deleted"))
+    logDelete(mod.id, mod.creationId ?: mod.name)
+    println(red("Mod '${mod.name}' deleted"))
 }
