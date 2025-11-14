@@ -5,6 +5,7 @@ import kotlin.io.path.Path
 
 fun stageMod(sourceFile: File, stageFolder: File, modName: String): Boolean {
     stageFolder.mkdirs()
+    stageFolder.backupIni()
     stageFolder.listFiles()?.forEach { it.deleteRecursively() }
     return when {
         sourceFile.isDirectory -> {
@@ -171,4 +172,21 @@ private fun case(folder: File) {
     } else folder
     if (!next.canExecute()) next.setExecutable(true, false)
     next.listFiles()?.filter { it.isDirectory }?.forEach { case(it) }
+}
+
+private fun File.backupIni() {
+    getAllFiles(listOf(".git")).filter { it.extension == "ini" }.forEach { ini ->
+        val downloadFolder = File("$HOME/Downloads/${gameMode.modFolder}/ini").also { it.mkdirs() }
+        val number = downloadFolder.listFiles()
+            .filter { it.nameWithoutExtension.startsWith(ini.nameWithoutExtension) }
+            .maxOfOrNull { it.nameWithoutExtension.split("-").last().toIntOrNull() ?: 0 }?.let { it + 1 } ?: 0
+        val target = Path(downloadFolder.path + "/${ini.nameWithoutExtension}-$number.ini")
+        Files.copy(ini.toPath(), target)
+        println(cyan("Backed up ini to ") + target)
+    }
+}
+
+private fun File.getAllFiles(ignore: List<String>): List<File> {
+    return listFiles().filter { !ignore.contains(it.name) }
+        .flatMap { if (it.isDirectory) it.getAllFiles(ignore) else listOf(it) }
 }
