@@ -142,7 +142,7 @@ private fun addAllCreations(force: Boolean = false) {
 
 fun addCreation(creationId: String): Creation? {
     val creations = parseCreationCatalog()
-    val creation: Creation? = creations[creationId] ?: creations.values.firstOrNull { it.modFileId.equals(creationId, ignoreCase = true) }
+    val creation = creations.getCreationById(creationId)
     creation?.let { addCreation(it) }
     return creation
 }
@@ -194,6 +194,10 @@ fun addCreation(creation: Creation) {
     }
 }
 
+private fun Map<String, Creation>.getCreationById(id: String) = this[id]
+    ?: values.firstOrNull { it.modFileId.equals(id, ignoreCase = true) }
+    ?: (keys.firstOrNull { it.equals(id, true) }?.let { this[it] })
+
 private fun rmAllCreations(force: Boolean = false) {
     val creations = toolData.mods.filter { it.creationId != null }
     confirm(force, yellow("Remove All Creations? ") + creations.joinToString(", ") { it.name }) {
@@ -219,10 +223,11 @@ fun rmCreation(mod: Mod, force: Boolean = false) {
 
 private fun forgetCreation(creationId: String) {
     val creations = parseCreationCatalog()
-    if (!creations.contains(creationId)) {
+    val creation = creations.getCreationById(creationId)
+    if (creation == null) {
         println(red("Could not find creation $creationId"))
     } else {
-        updateCreationCatalog(creations.minus(creationId).values.toList())
+        updateCreationCatalog(creations.minus(creation.creationId).values.toList())
         println("Forgot creation $creationId")
     }
 }
