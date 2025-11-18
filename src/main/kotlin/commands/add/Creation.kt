@@ -9,7 +9,6 @@ import gameConfig
 import jsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.json.JsonObject
 import modFolder
@@ -91,7 +90,6 @@ fun creation(command: String, args: List<String>) {
 }
 
 fun parseCreationCatalog(): Map<String, Creation> {
-
     val rawLines = File(gameMode.path(PathType.APP_DATA) + "/ContentCatalog.txt").readLines()
     val parsable = jsonMapper.decodeFromString<JsonObject>(rawLines.joinToString("\n")).filter { it.key != "ContentCatalog" }.toMap().let { jsonMapper.encodeToString(it) }
     return jsonMapper.decodeFromString<Map<String, Creation>>(parsable).also { it.entries.forEach { (id, creation) -> creation.creationId = id } }
