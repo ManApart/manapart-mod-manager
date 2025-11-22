@@ -50,7 +50,7 @@ enum class CommandType(
     REMOVE("Delete a mod", Category.ADD, removeHelp, removeDescription, ::remove, "rm", "delete"),
     SEARCH("Search Mods", Category.VIEW, searchDescription, searchModsUsage, ::searchMods, "grep", "awk"),
     SORT("Sort Mods", Category.VIEW, sortDescription, sortUsage, ::sortMods, "s"),
-    START("Launch Starfield", Category.CONFIG, startGameDescription, startGameUsage, ::startGame, "game"),
+    START("Launch Starfield", Category.CONFIG, startGameDescription, startGameUsage, ::startGame, "game", "g"),
     TAG("Edit tags on a mod", Category.EDIT, tagDescription, tagUsage, ::tag, "t", "tags"),
     UPDATE("Check for newer versions", Category.UPDATE, updateDescription, updateUsage, ::update, "up"),
     UPGRADE("Upgrade to newer versions", Category.UPDATE, upgradeDescription, upgradeUsage, ::upgrade, "ug"),

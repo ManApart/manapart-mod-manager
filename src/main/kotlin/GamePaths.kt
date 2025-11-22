@@ -53,7 +53,7 @@ fun starfieldPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(CATALOG, listOf("catalog"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/AppData/Local/Starfield/ContentCatalog.txt"),
         GeneratedPath(INI, listOf("ini", "inipath"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Starfield"),
         GeneratedPath(PLUGINS, listOf("plugins", "plugin"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/AppData/Local/Starfield/Plugins.txt"),
-        GeneratedPath(SAVES, listOf("saves"), GamePath.COMPAT_DATA, "pfx/drive_c/users/steamuser/Documents/My Games/Starfield/Saves"),
+        GeneratedPath(SAVES, listOf("saves"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Starfield/Saves"),
     ).associateBy { it.type }
 }
 
