@@ -2,6 +2,7 @@ package commands.open
 
 import GameMode
 import gameMode
+import kotlin.collections.sorted
 
 val pathsDescription = """
     List and open various common paths
@@ -11,7 +12,8 @@ val pathsDescription = """
         GameMode.entries.asSequence().flatMap { mode -> mode.generatedPaths.values.map { mode to it } }.groupBy { it.second.aliases.first() + it.second.type.description }.map { (_, paths) ->
             val modes = paths.map { it.first }.joinToString{it.abbreviation}
             val first = paths.first().second
-            first.aliases.first() +" ($modes) - " + first.type.description
+            val aliases = first.aliases.drop(1).takeIf { it.isNotEmpty() }?.let { ", $it" } ?: ""
+            first.aliases.first() +" ($modes)$aliases - " + first.type.description
         }.sorted().joinToString("\n")
 
 val pathsUsage = "paths\n"+
