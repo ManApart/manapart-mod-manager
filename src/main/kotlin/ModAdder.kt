@@ -182,4 +182,20 @@ fun addModFile(mod: Mod, sourceFile: File, modName: String, version: String? = m
     mod.version = version
 }
 
+fun addBlank(name: String) {
+    if (toolData.byName(name, true) != null) println("Mod already exists with that name") else {
+        val loadOrder = toolData.nextLoadOrder()
+        val stagePath = modFolder.path + "/" + name.replace(" ", "-")
+        val mod = Mod(name, stagePath, loadOrder + 1).also {
+            it.index = toolData.mods.size
+            toolData.mods.add(it)
+            save()
+        }
+        File(stagePath).mkdir()
+        println("${mod.name} created at index ${mod.index}")
+    }
+    logFetch(name)
+
+}
+
 fun String.cleanModName() = replace(" ", "-").replace("[^A-Za-z\\-]".toRegex(), "")
