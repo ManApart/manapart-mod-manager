@@ -19,7 +19,13 @@ data class GameConfig(
     var categories: Map<Int, String> = mapOf(),
     val paths: MutableMap<String, String> = mutableMapOf(),
 ) {
-    operator fun get(type: GamePath) = paths[type.name] ?: throw IllegalStateException("Missing ${type.name} use 'config path $type <path>' to set it")
+    operator fun get(type: String) = paths[type.uppercase()] ?: throw IllegalStateException("Missing $type use 'config path $type <path>' to set it")
+    operator fun get(type: GamePath) = paths[type.name] ?: throw IllegalStateException("Missing $type use 'config path $type <path>' to set it")
+
+    operator fun set(type: String, value: String) {
+        paths[type.uppercase()] = value
+    }
+
     operator fun set(type: GamePath, value: String) {
         paths[type.name] = value
     }

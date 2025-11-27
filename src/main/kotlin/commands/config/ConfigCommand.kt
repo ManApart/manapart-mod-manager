@@ -8,6 +8,7 @@ import jsonMapper
 import kotlinx.serialization.encodeToString
 import lastFullInput
 import nexus.getGameInfo
+import red
 import save
 import toolConfig
 import java.io.File
@@ -23,6 +24,8 @@ val configDescription = """
     categories - download game specific category names from nexus
     config path is used to set game specific paths
     config paths tells you what paths are needed
+    config path can be used to override built in paths as well (also see paths command)
+    config path delete can be used to delete an overridden path
     If your paths have spaces, make sure to quote them
     version gives the commit that the app was built from
 """.trimIndent()
@@ -41,7 +44,6 @@ val configUsage = """
 """.trimMargin()
 
 fun config(command: String, args: List<String>) {
-    val path = args.getOrNull(1)?.lowercase()?.let { a -> GamePath.entries.firstOrNull { it.name.lowercase() == a } }
     when {
         args.isEmpty() -> {
             println("Running ${gameMode.name} in ${File(".").absolutePath}")
@@ -51,8 +53,21 @@ fun config(command: String, args: List<String>) {
 
         args.size == 1 && args.last() == "paths" -> describePaths()
 
-        args.size == 3 && args[0] == "path" && path != null -> {
-            val newPath = lastFullInput.replace("config path ${path.name}", "", true).replace("\"", "").trim().let { if (it.endsWith("/")) it.substring(0, it.length-1) else it }
+        args.size == 3 && args[0] == "path" && args[1] == "delete" -> {
+            val toDelete = args[2].uppercase()
+            if (gameConfig.paths.containsKey(toDelete)){
+                val pathValue = gameConfig[toDelete]
+                gameConfig.paths.remove(toDelete)
+                save()
+                println(red("Deleted $toDelete: $pathValue"))
+            } else {
+                println(red("Unable to find path $toDelete"))
+            }
+        }
+
+        args.size == 3 && args[0] == "path" -> {
+            val path = args[1]
+            val newPath = lastFullInput.replace("config path $path", "", true).replace("\"", "").trim().let { if (it.endsWith("/")) it.substring(0, it.length-1) else it }
             gameConfig[path] = newPath
             println("Updated $path to ${gameConfig[path]}")
             save()

@@ -4,13 +4,13 @@ const val win64 = "/Binaries/Win64"
 const val ue4ss = "/Binaries/Win64/ue4ss/Mods"
 const val paks = "/Content/Paks/~mods"
 
-enum class GamePath(val discription: String, vararg val examples: String) {
-    GAME("The path to the folder under steam containing the Data folder. Note its nesting in Oblivion Remastered","/mnt/c/SteamLibrary/steamapps/common/Starfield", "/mnt/c/SteamLibrary/steamapps/common/Oblivion Remastered/OblivionRemastered"),
-    COMPAT_DATA("The folder is the steam app id under steam compat data","/mnt/c/SteamLibrary/steamapps/compatdata/2623190");
+enum class GamePath(val description: String, vararg val examples: String) {
+    GAME("The path to the folder under steam containing the Data folder. Note its nesting in Oblivion Remastered", "/mnt/c/SteamLibrary/steamapps/common/Starfield", "/mnt/c/SteamLibrary/steamapps/common/Oblivion Remastered/OblivionRemastered"),
+    COMPAT_DATA("The folder is the steam app id under steam compat data", "/mnt/c/SteamLibrary/steamapps/compatdata/2623190");
 
     fun describe() {
-        println(cyan(name) + ": $discription")
-        println("\t" + examples.joinToString("\n\t"){"config path $name \"$it\""})
+        println(cyan(name) + ": $description")
+        println("\t" + examples.joinToString("\n\t") { "config path $name \"$it\"" })
     }
 }
 
@@ -56,9 +56,8 @@ fun starfieldPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(INI, listOf("ini", "inipath"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Starfield"),
         GeneratedPath(PLUGINS, listOf("plugins", "plugin"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/AppData/Local/Starfield/Plugins.txt"),
         GeneratedPath(SAVES, listOf("saves"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Starfield/Saves"),
-        //TODO - steam compat data could be different, this is brittle
-        GeneratedPath(STEAM_PICS, listOf("steampics")) { "$HOME/.steam/debian-installation/userdata/72953529/760/remote/1716740/screenshots"},
-        GeneratedPath(SCREENSHOTS, listOf("screenshots", "photos")){ gameConfig[GamePath.GAME] + GameMode.STARFIELD.deployedModPath + "/textures/Photos" },
+        GeneratedPath(STEAM_PICS, listOf("steampics")) { "$HOME/.steam/debian-installation/userdata/72953529/760/remote/1716740/screenshots" },
+        GeneratedPath(SCREENSHOTS, listOf("screenshots", "photos")) { gameConfig[GamePath.GAME] + GameMode.STARFIELD.deployedModPath + "/textures/Photos" },
     ).associateBy { it.type }
 }
 
@@ -69,7 +68,7 @@ fun oblivionRemasteredPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(DATA, listOf("data")) { gameConfig[GamePath.GAME] + GameMode.OBLIVION_REMASTERED.deployedModPath },
         GeneratedPath(DATA_INI, listOf("ini", "inipath"), GamePath.GAME, "/Content/Dev/ObvData/"),
         GeneratedPath(UNREAL_INI, listOf("unrealini", "engineini"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Oblivion Remastered/Saved/Config/Windows"),
-        GeneratedPath(PLUGINS, listOf("plugins", "plugin")) {gameConfig[GamePath.GAME] + "/${GameMode.OBLIVION_REMASTERED.deployedModPath}/Plugins.txt"},
+        GeneratedPath(PLUGINS, listOf("plugins", "plugin")) { gameConfig[GamePath.GAME] + "/${GameMode.OBLIVION_REMASTERED.deployedModPath}/Plugins.txt" },
         GeneratedPath(WIN64, listOf("win64"), GamePath.GAME, win64),
         GeneratedPath(UE4SS_Mods, listOf("ue4ss"), GamePath.GAME, ue4ss),
         GeneratedPath(WINGDK, listOf("wingdk"), GamePath.GAME, "/Binaries/wingdk/ue4ss/Mods"),
