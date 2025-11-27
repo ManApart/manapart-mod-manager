@@ -20,6 +20,7 @@ enum class CommandType(
 ) {
     ABSTAIN("Abstain from endorsing Mod", Category.EDIT, endorseDescription, "abstain <index>", ::abstain),
     ADD("Add a new mod", Category.ADD, addModDescription, addModUsage, ::addMod, "a"),
+    CATEGORY("View categories", Category.EDIT, categoryDescription, categoryUsage, ::category, "cat", "categories"),
     CONFIG("Edit Configuration", Category.CONFIG, configDescription, configUsage, ::config, "c"),
     CLI("Open local mod folder in terminal", Category.OPEN, openCliDescription, cliUsage, ::open, "terminal", "term"),
     CREATION("Manage Creation", Category.ADD, creationDescription, creationUsage, ::creation, "creations", "cr"),

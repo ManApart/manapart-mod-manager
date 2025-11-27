@@ -5,6 +5,7 @@ import GameMode
 import Table
 import gameConfig
 import gameMode
+import toTable
 import toolConfig
 import kotlin.collections.sorted
 
@@ -40,6 +41,7 @@ fun paths(command: String, args: List<String>) {
     val overridePath = gameConfig[command]
     val gamePath = gameMode.generatedPaths.values.firstOrNull { it.aliases.contains(command) }
     when {
+        //TODO - this is broken, needs to be nullable
         overridePath != null -> open(overridePath, command, args.contains("cli"))
         openType != null -> openType.invoke(args)
         gamePath != null -> open(gamePath.path(), gamePath.type.name, args.contains("cli"))
@@ -52,13 +54,10 @@ fun paths(command: String, args: List<String>) {
 }
 
 private fun listPaths() {
-    val columns = listOf(Column("Name", 25), Column("Value", 40))
     val base = gameMode.generatedPaths.entries.associate { (type, generated) ->
         type.name to generated.path()
     }.toMutableMap()
     gameConfig.paths.forEach { (key, value) -> base[key] = value }
-    val data = base.entries.sortedBy { it.key }.map { (key, value) ->
-        mapOf("Name" to key, "Value" to value)
-    }
-    Table(columns, data).print()
+    base.entries.sortedBy { it.key }
+        .toTable("Name", 25, "Value", 40).print()
 }

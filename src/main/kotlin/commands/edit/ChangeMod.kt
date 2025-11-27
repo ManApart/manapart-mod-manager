@@ -9,6 +9,7 @@ val changeDescription = """
     Change various parts of a mod.
     Use id to set its nexus id
     Use file to delete a mods stage folder and restage it from zip
+    To see a list of category ids, see the category command
 """.trimIndent()
 val renameHelp = """
     Use name to rename a mod without changing its file paths
@@ -18,6 +19,7 @@ val changeUsage = """
     mod <index> id <new id>
     mod <index> file <file-path> 
     mod <index> name <new name>
+    mod <index> category <new category id>
 """.trimIndent()
 
 fun moveMod(command: String, args: List<String>){
@@ -31,6 +33,7 @@ fun changeMod(command: String, args: List<String>) {
         args.size == 3 && args[1] == "id" -> updateId(i!!, args.last().toInt())
         args.size == 3 && args[1] == "file" -> updateFile(i!!, args.last())
         args.size == 3 && args[1] == "name" -> updateName(i!!, args.last())
+        args.size == 3 && args[1] == "category" && args.last().toIntOrNull() != null -> changeCategory(i!!, args.last().toInt())
         else -> println(changeDescription)
     }
 }

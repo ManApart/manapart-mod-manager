@@ -1,4 +1,3 @@
-
 fun String?.truncate(length: Int = 6): String {
     return this?.substring(0, kotlin.math.min(this.length, length)) ?: ""
 }
@@ -23,3 +22,16 @@ data class Table(val columns: List<Column>, val data: List<Map<String, Any>>) {
 }
 
 data class Column(val header: String, val size: Int, val isNumber: Boolean = false)
+
+@JvmName("toTableIntMap")
+fun Map<Int, String>.toTable(keyHeader: String, keyLength: Int, valueHeader: String, valueLength: Int) = entries.associate { (k, v) -> k.toString() to v }.toTable(keyHeader, keyLength, valueHeader, valueLength)
+
+fun Map<String, String>.toTable(keyHeader: String, keyLength: Int, valueHeader: String, valueLength: Int) = entries.toList().toTable(keyHeader,keyLength,valueHeader,valueLength)
+
+fun List<Map.Entry<String, String>>.toTable(keyHeader: String, keyLength: Int, valueHeader: String, valueLength: Int): Table {
+    val columns = listOf(Column(keyHeader, keyLength), Column(valueHeader, valueLength))
+    val data = map { (k, v) ->
+        mapOf(keyHeader to k, valueHeader to v)
+    }
+    return Table(columns, data)
+}
