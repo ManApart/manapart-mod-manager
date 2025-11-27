@@ -41,7 +41,6 @@ fun paths(command: String, args: List<String>) {
     val overridePath = gameConfig[command]
     val gamePath = gameMode.generatedPaths.values.firstOrNull { it.aliases.contains(command) }
     when {
-        //TODO - this is broken, needs to be nullable
         overridePath != null -> open(overridePath, command, args.contains("cli"))
         openType != null -> openType.invoke(args)
         gamePath != null -> open(gamePath.path(), gamePath.type.name, args.contains("cli"))
