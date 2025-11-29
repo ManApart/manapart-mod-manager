@@ -13,6 +13,7 @@ val searchDescription = """
     Searching a string will search name, category, and tags.
     To search ONLY tags, use search tag <tagName>.
     The same can be done to search by category or name as well
+    Missing searches for missing ids, nocat searches for mods without a category
     When a filter is applied, search only looks within the filtered data
 """.trimIndent()
 
@@ -31,6 +32,7 @@ val searchModsUsage = """
     search unendorsed
     search abstained
     search missing
+    search nocat
     search upgrade
 """.trimIndent()
 
@@ -61,10 +63,8 @@ fun searchMods(persist: Boolean, args: List<String> = listOf()) {
     }
     val unendorsed = args.contains("unendorsed")
     val upgrade = args.contains("upgrade")
-    val missing = when {
-        args.contains("missing") -> true
-        else -> null
-    }
+    val missing = if(args.contains("missing")) true else null
+    val missingCat = if(args.contains("nocat")) true else null
     val id = args.firstOrNull { it.toIntOrNull() != null }
     val flagList = listOf("enabled", "disabled", "staged", "unstaged", "endorsed", "abstained", "unendorsed", "tag", "name", "category", "upgrade")
     val search = args.filter { !flagList.contains(it) && it.toIntOrNull() == null }.joinToString(" ").lowercase()
@@ -77,7 +77,7 @@ fun searchMods(persist: Boolean, args: List<String> = listOf()) {
     }
 
     val mods = toolData.mods.map { mod ->
-        val displayed = mod.show && mod.isDisplayed(enabled, staged, missing, upgrade, id, endorsed, unendorsed, searchType, search)
+        val displayed = mod.show && mod.isDisplayed(enabled, staged, missing, missingCat, upgrade, id, endorsed, unendorsed, searchType, search)
         if (persist) mod.show = displayed
         mod to displayed
     }
@@ -88,6 +88,7 @@ private fun Mod.isDisplayed(
     enabled: Boolean?,
     staged: Boolean?,
     missing: Boolean?,
+    missingCat: Boolean?,
     upgrade: Boolean,
     id: String?,
     endorsed: Boolean?,
@@ -98,6 +99,7 @@ private fun Mod.isDisplayed(
     return (enabled != null && enabled == this.enabled) ||
             (staged != null && staged == File(filePath).exists()) ||
             (upgrade == true && this.updateAvailable()) ||
+            (missingCat != null && this.categoryId == null) ||
             (missing != null && missing == (this.id == null)) ||
             (id != null && this.id?.toString()?.contains(id) ?: false) ||
             (endorsed != null && endorsed == this.endorsed) || (unendorsed && this.endorsed == null) ||
