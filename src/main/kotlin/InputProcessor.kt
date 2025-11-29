@@ -3,8 +3,10 @@ import commands.getCommand
 
 var lastFullInput = ""
 
-fun readLine(line: String?) {
-    val parts = line?.parseArgs()?.map { it.lowercase() } ?: return
+fun readLine(line: String?) = line?.split("&")?.forEach { readCommand(it) }
+
+fun readCommand(line: String) {
+    val parts = line.parseArgs().map { it.lowercase() }
     lastFullInput = line
     when {
         parts.isEmpty() -> CommandType.HELP.usage
