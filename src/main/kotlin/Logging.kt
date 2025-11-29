@@ -35,6 +35,8 @@ fun logLaunch() {
     logEvent(LogEvent.LaunchEvent(now(), modHash.hash))
 }
 
+fun logNote(note: String) = logEvent(LogEvent.NoteEvent(now(), note))
+
 private fun updateHashFile(modHash: ModHash) {
     val hashFile = File(
         gameMode.configPath.replace("-config", "-hashes")

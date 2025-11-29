@@ -41,6 +41,7 @@ enum class CommandType(
     MODE("Switch Games", Category.CONFIG, modeDescription, modeUsage, ::selectGameMode),
     MOD("Update a mod", Category.EDIT, changeDescription, changeUsage, ::changeMod, "m"),
     NEST("Nest mode files", Category.ADD, nestDescription, nestUsage, ::nest, "n"),
+    NOTE("Make a log note", Category.CONFIG, noteDescription,noteUsage, ::noteCommand),
     ORDER("Change Load Order", Category.DEPLOY, orderDescription, orderUsage, ::order, "or"),
     OPEN("Open mod on web", Category.OPEN, openDescription,  openUsage, ::open, *openAliases),
     PURGE("Purge all sym links", Category.DEPLOY, purgeDescription, purgeUsage, ::purge),
