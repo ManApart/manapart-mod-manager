@@ -25,7 +25,7 @@ enum class CommandType(
     CLI("Open local mod folder in terminal", Category.OPEN, openCliDescription, cliUsage, ::open, "terminal", "term"),
     CREATION("Manage Creation", Category.ADD, creationDescription, creationUsage, ::creation, "creations", "cr"),
     DEPLOY("Deploy enabled mods", Category.DEPLOY, deployDescription, deployUsage, ::deploy, "d"),
-    DETAIL("View all details of mod", Category.VIEW, detailDescription, detailUsage, ::detailMod, "dd", "show"),
+    DETAIL("View all details of mod", Category.VIEW, detailDescription, detailUsage, ::detailMod, "dd", "show", "view"),
     DISABLE("Disable Mod", Category.DEPLOY, enableDescription, disableUsage, ::disable, "x"),
     ENABLE("Enable Mod", Category.DEPLOY, enableDescription, enableUsage, ::enable, "e"),
     ENDORSE("Endorse Mod", Category.EDIT, endorseDescription, endorseUsage, ::endorse, "en"),
