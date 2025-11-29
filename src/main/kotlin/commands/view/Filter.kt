@@ -3,6 +3,7 @@ package commands.view
 val filterDescription = """
     Filter mods that contain the given text (name or category) or status, including missing ids
     Changes persist across future ls until filter clear or filter all is called
+    Filter is additive, meaning it further filters whatever is currently displayed
     To do a one time search, see search
 """.trimIndent()
 

@@ -13,6 +13,7 @@ val searchDescription = """
     Searching a string will search name, category, and tags.
     To search ONLY tags, use search tag <tagName>.
     The same can be done to search by category or name as well
+    When a filter is applied, search only looks within the filtered data
 """.trimIndent()
 
 val searchModsUsage = """
@@ -39,8 +40,8 @@ fun searchMods(command: String, args: List<String> = listOf()) {
 
 fun searchMods(persist: Boolean, args: List<String> = listOf()) {
     if (args.firstOrNull() == "all" || args.firstOrNull() == "clear") {
-        toolData.mods.forEach { it.show = true }
-        listMods("")
+        if (persist) toolData.mods.forEach { it.show = true }
+        display(toolData.mods.map { it to true })
         return
     }
     val enabled = when {
@@ -76,7 +77,7 @@ fun searchMods(persist: Boolean, args: List<String> = listOf()) {
     }
 
     val mods = toolData.mods.map { mod ->
-        val displayed = mod.isDisplayed(enabled, staged, missing, upgrade, id, endorsed, unendorsed, searchType, search)
+        val displayed = mod.show && mod.isDisplayed(enabled, staged, missing, upgrade, id, endorsed, unendorsed, searchType, search)
         if (persist) mod.show = displayed
         mod to displayed
     }
