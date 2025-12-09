@@ -22,21 +22,24 @@ tag ls - Lists all tags and number of mods using that tag
 val tagUsage = """
    tag 1 add essential
    tag 1 rm essential
+   tag 1 3 4 add cool
    tag 1 rm 0
    tag ls
 """.trimIndent()
 
 fun tag(command: String, args: List<String>) {
-    val i = args.firstOrNull()?.toIntOrNull()
-    val mod = i?.let { toolData.byIndex(it) }
-    val subCommand = args.getOrNull(1)?.replace("rm", "remove")
-    val tagArg = args.getOrNull(2)
+    val modIds = args.takeWhile { it.toIntOrNull() != null }.mapNotNull { it.toIntOrNull() }
+    val subCommand = args.firstOrNull { it.toIntOrNull() == null }
+    val tagArg = subCommand?.let { sub -> args.indexOf(sub) }?.let { args.getOrNull(it + 1) }
+    val mods = modIds.mapNotNull { toolData.byIndex(it) }
+    val remove = subCommand == "remove" || subCommand == "rm"
     when {
         args.isEmpty() || args.first() == "ls" -> printTags()
-        mod == null -> println("Must provide the index of a valid mod to update")
-        subCommand == "add" -> addTag(mod, tagArg)
-        subCommand == "remove" && tagArg?.toIntOrNull() != null -> removeTag(mod, tagArg.toInt())
-        subCommand == "remove" && tagArg != null -> removeTag(mod, tagArg)
+        mods.isEmpty() || modIds.size != mods.size -> println("Must provide the index of a valid mod to update")
+        subCommand == "add" -> addTag(mods, tagArg)
+        remove && mods.size > 1 && tagArg?.toIntOrNull() != null -> println("When removing by index you can only remove tags from one mod at a time")
+        remove && tagArg?.toIntOrNull() != null -> removeTag(mods, tagArg.toInt())
+        remove && tagArg != null -> removeTag(mods, tagArg)
 
         else -> println("Unknown args: ${args.joinToString(" ")}")
     }
@@ -50,26 +53,27 @@ private fun printTags() {
     println(tags.entries.joinToString("\n") { (key, amount) -> "$key (${amount.size})" })
 }
 
-private fun addTag(mod: Mod, tag: String?) {
+private fun addTag(mods: List<Mod>, tag: String?) {
     if (tag == null) {
         println("No tag value found to add")
         return
     }
-    mod.tags.add(tag)
+    mods.forEach { it.tags.add(tag) }
     save()
-    println("Added $tag to ${mod.name}")
+    println("Added $tag to ${mods.joinToString(", ") { it.name }}")
 }
 
-private fun removeTag(mod: Mod, tagId: Int) = removeTag(mod, mod.tags.elementAt(tagId))
+private fun removeTag(mods: List<Mod>, tagId: Int) = removeTag(mods, mods.first().tags.elementAt(tagId))
 
-private fun removeTag(mod: Mod, tag: String) {
-    if (!mod.tags.contains(tag)) {
-        println(red("Tag ") + cyan("'$tag'") + red(" doesn't exist in ") + cyan("'${mod.tags.joinToString(", ")}'") + ". (Command is case sensitive.)")
+private fun removeTag(mods: List<Mod>, tag: String) {
+    val modWithMissingTags = mods.firstOrNull { !it.tags.contains(tag) }
+    if (modWithMissingTags != null) {
+        println(red("Tag ") + cyan("'$tag'") + red(" doesn't exist in ") + cyan("'${modWithMissingTags.tags.joinToString(", ")}'") + ". (Command is case sensitive.)")
         return
     }
     confirm(false, yellow("Remove tag $tag? ")) {
-        mod.tags.remove(tag)
+        mods.forEach { it.tags.remove(tag) }
         save()
-        println("Removed $tag from ${mod.name}")
+        println("Removed $tag from ${mods.joinToString(", ") { it.name }}")
     }
 }
