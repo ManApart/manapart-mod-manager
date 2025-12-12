@@ -112,15 +112,18 @@ fun parseCreationPlugins(): List<String> {
 private fun listCreations() {
     val columns = listOf(
         Column("Creation Id", 42),
-        Column("Mod File Id", 15),
+        Column("Mod File Id", 35),
         Column("Managed", 15),
+        Column("Mod Index", 10),
         Column("Title", 22),
     )
     val data = parseCreationCatalog().values.map { creation ->
+        val mod = creation.creationId?.let { toolData.byCreationId(it) }
         mapOf(
             "Creation Id" to (creation.creationId ?: ""),
             "Mod File Id" to (creation.modFileId ?: ""),
-            "Managed" to (creation.creationId?.let { toolData.byCreationId(it) } != null),
+            "Managed" to (mod != null),
+            "Mod Index" to (mod?.index ?: ""),
             "Title" to creation.title,
         )
     }
