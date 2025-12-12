@@ -124,7 +124,7 @@ private fun listCreations() {
             "Mod File Id" to (creation.modFileId ?: ""),
             "Managed" to (mod != null),
             "Mod Index" to (mod?.index ?: ""),
-            "Title" to creation.title,
+            "Title" to (mod?.name ?: creation.title),
         )
     }
 
