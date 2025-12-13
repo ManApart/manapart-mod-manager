@@ -1,3 +1,4 @@
+import commands.deploy.profile
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -36,6 +37,20 @@ fun logLaunch() {
 
 fun logNote(note: String) = logEvent(LogEvent.NoteEvent(now(), note))
 
+fun logSaveProfileEvent(profile: Profile) {
+    if (!toolConfig.logging) return
+    val modHash = createModHash()
+    updateHashFile(modHash)
+    logEvent(LogEvent.SaveProfileEvent(now(), profile.name, modHash.hash))
+}
+
+fun logLoadProfileEvent(profile: Profile, preLoadHash: ModHash) {
+    if (!toolConfig.logging) return
+    val modHash = createModHash()
+    updateHashFile(modHash)
+    logEvent(LogEvent.LoadProfileEvent(now(), profile.name, preLoadHash.hash, modHash.hash))
+}
+
 private fun updateHashFile(modHash: ModHash) {
     val hashFile = File(
         gameMode.configPath.replace("-config", "-hashes")
@@ -62,7 +77,7 @@ private fun logEvent(event: LogEvent) {
 @OptIn(ExperimentalTime::class)
 private fun now(): LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-private fun createModHash(): ModHash {
+fun createModHash(): ModHash {
     val (modIds, modNames) = toolData.mods.filter { it.enabled }.partition { it.id != null }
     return ModHash(modIds.mapNotNull { it.id }.sorted(), modNames.map { it.creationId ?: it.name }.sorted())
 }

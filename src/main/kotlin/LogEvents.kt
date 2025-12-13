@@ -28,4 +28,12 @@ sealed class LogEvent {
     @Serializable
     @SerialName("note")
     data class NoteEvent(override val at: LocalDateTime, val note: String) : LogEvent()
+
+    @Serializable
+    @SerialName("saveProfile")
+    data class SaveProfileEvent(override val at: LocalDateTime, val profileName: String, val hash: String) : LogEvent()
+
+    @Serializable
+    @SerialName("loadProfile")
+    data class LoadProfileEvent(override val at: LocalDateTime, val profileName: String, val preLoadHash: String, val postLoadHash: String) : LogEvent()
 }

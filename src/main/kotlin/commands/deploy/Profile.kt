@@ -4,6 +4,9 @@ import Column
 import Profile
 import Table
 import confirm
+import createModHash
+import logLoadProfileEvent
+import logSaveProfileEvent
 import save
 import toolData
 
@@ -68,12 +71,15 @@ private fun loadProfile(i: Int) {
         println("Could not find profile for $i")
         return
     }
+
+    val preLoadHash = createModHash()
     toolData.mods.forEach { mod ->
         val enabled = profile.ids.contains(mod.id) || profile.filePaths.contains(mod.filePath)
         enableMod(enabled, mod.index)
     }
     save()
-    println("Loaded ${profile.name}")
+    logLoadProfileEvent(profile, preLoadHash)
+    println("Loaded ${profile.name}. Remember to deploy if desired.")
 }
 
 private fun compareProfile(i: Int) {
@@ -108,6 +114,7 @@ private fun saveProfile(i: Int) {
                 profile.ids = newIds
                 profile.filePaths = newPaths
                 save()
+                logSaveProfileEvent(profile)
                 println("Saved ${profile.name}")
             }
         } else {
