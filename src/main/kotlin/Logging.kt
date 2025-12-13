@@ -2,6 +2,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.io.File
+import kotlin.collections.sorted
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -28,9 +29,7 @@ fun logDelete(id: Int?, name: String) {
 
 fun logLaunch() {
     if (!toolConfig.logging) return
-    val (modIds, modNames) = toolData.mods.filter { it.enabled }.partition { it.id != null }
-
-    val modHash = ModHash(modIds.mapNotNull { it.id }, modNames.map { it.creationId ?: it.name })
+    val modHash = createModHash()
     updateHashFile(modHash)
     logEvent(LogEvent.LaunchEvent(now(), modHash.hash))
 }
@@ -62,3 +61,8 @@ private fun logEvent(event: LogEvent) {
 
 @OptIn(ExperimentalTime::class)
 private fun now(): LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+private fun createModHash(): ModHash {
+    val (modIds, modNames) = toolData.mods.filter { it.enabled }.partition { it.id != null }
+    return ModHash(modIds.mapNotNull { it.id }.sorted(), modNames.map { it.creationId ?: it.name }.sorted())
+}
