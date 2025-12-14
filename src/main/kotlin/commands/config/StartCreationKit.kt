@@ -1,12 +1,11 @@
 package commands.config
 
-import gameMode
 import logLaunch
 import runCommand
 import java.io.File
 
 val startCKDescription = """
-    Run the steam game
+    Run the Creation Kit Editor
 """.trimIndent()
 
 val startSKUsage = """
