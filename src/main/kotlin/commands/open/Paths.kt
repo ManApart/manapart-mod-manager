@@ -1,13 +1,9 @@
 package commands.open
 
-import Column
 import GameMode
-import Table
 import gameConfig
 import gameMode
 import toTable
-import toolConfig
-import kotlin.collections.sorted
 
 val pathsDescription = """
     List and open various common paths
