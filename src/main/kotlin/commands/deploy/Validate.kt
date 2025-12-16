@@ -2,9 +2,11 @@ package commands.deploy
 
 import Mod
 import StageChange
+import commands.add.Creation
 import commands.edit.Tag
 import commands.add.getExternalMods
 import commands.add.parseCreationCatalog
+import commands.add.parseCreationPlugins
 import cyan
 import detectStagingChanges
 import doCommand
@@ -60,6 +62,9 @@ fun List<Mod>.validate() {
     val nonModErrors = mutableListOf<String>()
     val helpMessages = mutableSetOf<String>()
     val modsWithFiles = associateWith { it.getModFiles() }
+    val creationCatalog = if (gameMode == GameMode.STARFIELD) parseCreationCatalog() else mapOf()
+    val creations = if (gameMode == GameMode.STARFIELD) parseCreationPlugins(creationCatalog) else listOf()
+    val externalMods = if (gameMode == GameMode.STARFIELD) getExternalMods(creations) else mapOf()
 
     addDupeIds(errorMap)
     addDupeFilenames(errorMap)
@@ -67,12 +72,13 @@ fun List<Mod>.validate() {
     detectDupePlugins()
     detectIncorrectCasing(errorMap)
     modsWithFiles.checkHasFiles(errorMap)
-    modsWithFiles.filter { it.value.isNotEmpty() }.detectTopLevelFiles(errorMap)
+    modsWithFiles.addEmptyEnabled(errorMap)
+    modsWithFiles.filter { it.value.isNotEmpty() }.detectTopLevelFiles(errorMap, helpMessages)
     checkPlugins(errorMap, helpMessages)
 
     if (gameMode == GameMode.STARFIELD) {
-        checkCreations(nonModErrors, helpMessages)
-        checkExternalMods(nonModErrors, helpMessages)
+        checkCreations(nonModErrors, helpMessages, creationCatalog)
+        checkExternalMods(nonModErrors, helpMessages, externalMods)
     }
 
     val filteredErrors = errorMap.filter { it.value.first in this }.toMap()
@@ -88,7 +94,8 @@ fun List<Mod>.validate() {
         helpMessages.forEach { println(it) }
         println()
     }
-    println(cyan("Validated $size mods, ${filteredErrors.keys.size + nonModErrors.size} mods failed validation"))
+
+    println(cyan("Validated $size mods and ${creations.size} creations, ") + yellow("${filteredErrors.keys.size + nonModErrors.size} mods failed validation"))
 }
 
 private fun List<Mod>.addDupeIds(
@@ -196,7 +203,8 @@ private fun Map<Mod, List<File>>.checkHasFiles(
 }
 
 private fun Map<Mod, List<File>>.detectTopLevelFiles(
-    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
+    helpMessages: MutableSet<String>
 ) {
     val excludeList = listOf("sfse_loader.exe", "Engine.ini")
     val goodPaths = (gameMode.generatedPaths.values.mapNotNull { it.suffix.split("/").getOrNull(1) } + gameMode.deployedModPath.drop(1)).filter { it.isNotBlank() }.toSet()
@@ -208,6 +216,7 @@ private fun Map<Mod, List<File>>.detectTopLevelFiles(
     }.forEach { (mod, _) ->
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Has files outside the Data folder")
+        helpMessages.add("To fix files outside of data, either skip validating this mod, or use local to open it and manually fix file structure")
     }
 }
 
@@ -229,17 +238,25 @@ private fun checkPlugins(
     }
 }
 
-private fun checkCreations(errors: MutableList<String>, helpMessages: MutableSet<String>) {
-    parseCreationCatalog().values.filter { creation -> (creation.creationId?.let { toolData.byCreationId(it) } == null) }.forEach { creation ->
+private fun checkCreations(errors: MutableList<String>, helpMessages: MutableSet<String>, creations:  Map<String, Creation>) {
+    creations.values.filter { creation -> (creation.creationId?.let { toolData.byCreationId(it) } == null) }.forEach { creation ->
         errors.add("Creation '${creation.title}' is not managed")
         helpMessages.add("To manage creations try 'help creation'")
     }
 }
 
-private fun checkExternalMods(errors: MutableList<String>, helpMessages: MutableSet<String>) {
-    getExternalMods().filter { it.value == null }.keys.forEach {
+private fun checkExternalMods(errors: MutableList<String>, helpMessages: MutableSet<String>, externalMods: Map<String, Mod?>) {
+    externalMods.filter { it.value == null }.keys.forEach {
         errors.add("External Mod '$it' is not managed")
         helpMessages.add("To manage external plugins try 'help external'")
+    }
+}
+
+private fun Map<Mod, List<File>>.addEmptyEnabled(
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>){
+    filter { it.key.enabled && it.value.isEmpty() }.forEach { (mod, _) ->
+            errorMap.putIfAbsent(mod.index, mod to mutableListOf())
+            errorMap[mod.index]?.second?.add("Enabled but not installed")
     }
 }
 

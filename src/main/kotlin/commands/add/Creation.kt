@@ -105,8 +105,8 @@ fun updateCreationCatalog(creations: List<Creation>) {
     File(gameMode.path(PathType.APP_DATA) + "/ContentCatalog.txt").writeText(fullText)
 }
 
-fun parseCreationPlugins(): List<String> {
-    return parseCreationCatalog().values.flatMap { creation -> creation.files.filter { file -> espTypes.any { file.endsWith(it) } } }
+fun parseCreationPlugins(creationCatalog: Map<String, Creation> = parseCreationCatalog()): List<String> {
+    return creationCatalog.values.flatMap { creation -> creation.files.filter { file -> espTypes.any { file.endsWith(it) } } }
 }
 
 private fun listCreations() {

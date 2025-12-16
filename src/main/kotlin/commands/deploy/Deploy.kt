@@ -3,13 +3,14 @@ package commands.deploy
 import Mod
 import cyan
 import gameConfig
+import gameMode
 import toolData
 import verbose
+import yellow
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import kotlin.io.path.Path
-import gameMode
 
 val deployDescription = """
     Applies all enabled mods to the game folder by creating the appropriate symlinks
@@ -24,11 +25,11 @@ val deployUsage = """
 """.trimIndent()
 
 fun deploy(command: String, args: List<String>) {
-    val files = getAllModFiles()
+    val files = getAllModFiles(true)
     when {
         args.firstOrNull() == "dryrun" -> deployDryRun(command, files)
         args.firstOrNull() == "overrides" -> showOverrides()
-        files.isEmpty() -> println("No mod files found")
+        files.isEmpty() -> println(yellow("No mod files found"))
         else -> {
             getDisabledModPaths().forEach { deleteLink(it, files) }
             files.entries.forEach { (gamePath, modFile) -> makeLink(gamePath, modFile) }
@@ -41,21 +42,20 @@ fun deploy(command: String, args: List<String>) {
 private fun getDisabledModPaths(): List<String> {
     return toolData.mods.filter { !it.enabled }.flatMap { mod ->
         val modRoot = File(mod.filePath).absolutePath + "/"
-        mod.getModFiles().map { file ->
-            file.absolutePath.replace(modRoot, "")
-        }
+        mod.getModFiles()
+            .map { it.absolutePath.replace(modRoot, "") }
     }
 }
 
-private fun getAllModFiles(): Map<String, File> {
+private fun getAllModFiles(logMissing: Boolean = false): Map<String, File> {
     val mappings = mutableMapOf<String, File>()
-    toolData.mods.filter { it.enabled }.sortedBy { it.loadOrder }.forEach { mappings.addModFiles(it) }
+    toolData.mods.filter { it.enabled }.sortedBy { it.loadOrder }.forEach { mappings.addModFiles(it, logMissing) }
     return mappings
 }
 
-private fun MutableMap<String, File>.addModFiles(mod: Mod) {
+private fun MutableMap<String, File>.addModFiles(mod: Mod, logMissing: Boolean = false) {
     val modRoot = File(mod.filePath).absolutePath + "/"
-    mod.getModFiles().forEach { file ->
+    mod.getModFiles().also { if (logMissing && it.isEmpty()) println(yellow("No files found for ${mod.name}")) }.forEach { file ->
         this[file.absolutePath.replace(modRoot, "")] = file
     }
 }

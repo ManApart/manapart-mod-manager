@@ -16,7 +16,7 @@ import commands.edit.Tag
 import commands.deploy.espTypes
 import logFetch
 
-private val ignoredExternalPlugins = listOf("Starfield", "OldMars", "Constellation", "BlueprintShips-Starfield", "SFBGS003", "SFBGS006", "SFBGS007", "SFBGS008")
+private val ignoredExternalPlugins = listOf("Starfield", "OldMars", "Constellation", "BlueprintShips-Starfield", "ShatteredSpace", "SFBGS003", "SFBGS006", "SFBGS007", "SFBGS008")
 
 val externalModDescription = """
 Tools for managing external plugins
@@ -97,8 +97,7 @@ fun addExternal(esp: String, name: String? = null) {
     println("Added (${mod.index}) ${mod.name}")
 }
 
-fun getExternalMods(): Map<String, Mod?> {
-    val creations = parseCreationPlugins()
+fun getExternalMods(creations: List<String> = parseCreationPlugins()): Map<String, Mod?> {
     return File(gameConfig[GAME] + "/Data").listFiles()!!
         .asSequence()
         .filter {
