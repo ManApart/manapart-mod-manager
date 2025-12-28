@@ -2,10 +2,7 @@ import commands.edit.Tag
 import commands.deploy.espTypes
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import sun.util.calendar.CalendarUtils.mod
 import java.io.File
-import kotlin.collections.listOf
-import kotlin.getValue
 
 @Serializable
 data class Mod(
@@ -15,7 +12,7 @@ data class Mod(
     var id: Int? = null,
     var plugins: List<String> = emptyList(),
     var creationId: String? = null,
-    var deployTarget: PathType = PathType.DATA,
+    var deployTarget: PathType = gameConfig.defaultDeployTarget,
     var downloadPath: String? = null,
     var fileId: Int? = null,
     var latestFileId: Int? = null,

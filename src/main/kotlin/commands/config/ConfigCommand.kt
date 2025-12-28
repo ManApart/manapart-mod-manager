@@ -19,7 +19,7 @@ val configDescription = """
     open-in-terminal-command is optional and only needed if you don't use `gnome-terminal`. This value will be used as the command when opening folders in the terminal. Will be run in the relevant folder, but if you need to specify the directory in the command, you can use `{pwd}` and it will be replaced by the relevant path.
     verbose gives additional output (for debugging) if set to true
     autodeploy automatically runs deploy when enabling or disabling mods. Defaults to true
-    use-my-docs optionally allows deploying mod files under Data to my documents instead of the game folder. (Defaults to false) 
+    deploytarget - set the default path for mods to deploy to. Defaults to the Data directory but could be used to deploy to app data etc
     logging - log events like launch (and load order) or first time fetching a mod etc, on by default
     categories - download game specific category names from nexus
     config path is used to set game specific paths
@@ -37,7 +37,7 @@ val configUsage = """
     |config open-in-terminal-command <path-to-folder> 
     |config verbose <true/false>
     |config autodeploy <true/false>
-    |config use-my-docs <true/false> 
+    |config deploytarget <PATHTYPE>
     |config logging <true/false>
     |config categories
     |config version
@@ -55,7 +55,7 @@ fun config(command: String, args: List<String>) {
 
         args.size == 3 && args[0] == "path" && args[1] == "delete" -> {
             val toDelete = args[2].uppercase()
-            if (gameConfig.paths.containsKey(toDelete)){
+            if (gameConfig.paths.containsKey(toDelete)) {
                 val pathValue = gameConfig[toDelete]
                 gameConfig.paths.remove(toDelete)
                 save()
@@ -67,7 +67,7 @@ fun config(command: String, args: List<String>) {
 
         args.size == 3 && args[0] == "path" -> {
             val path = args[1]
-            val newPath = lastFullInput.replace("config path $path", "", true).replace("\"", "").trim().let { if (it.endsWith("/")) it.substring(0, it.length-1) else it }
+            val newPath = lastFullInput.replace("config path $path", "", true).replace("\"", "").trim().let { if (it.endsWith("/")) it.substring(0, it.length - 1) else it }
             gameConfig[path] = newPath
             println("Updated $path to ${gameConfig[path]}")
             save()
@@ -95,9 +95,18 @@ fun config(command: String, args: List<String>) {
             }
         }
 
+        args.first() == "deploytarget" && args.size == 2 -> {
+            val newTarget = PathType.entries.firstOrNull { it.name.lowercase() == args[1] }
+            if (newTarget != null) {
+                gameConfig.defaultDeployTarget = newTarget
+                println("Set default deploy target to ${gameConfig.defaultDeployTarget}")
+                save()
+            } else println("${args[1]} does not exist in ${PathType.entries}")
+        }
+
+        args.first() == "deploytarget" -> println("Deploy target options are: ${PathType.entries}")
         args.first() == "verbose" -> updateFlag(args, toolConfig::verbose)
         args.first() == "autodeploy" -> updateFlag(args, toolConfig::autoDeploy)
-        args.first() == "use-my-docs" -> updateFlag(args, toolConfig::useMyDocs)
         args.first() == "version" -> viewAppVersion()
 
         else -> println("Unknown args: ${args.joinToString(" ")}")

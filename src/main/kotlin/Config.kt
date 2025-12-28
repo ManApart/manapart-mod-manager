@@ -1,12 +1,10 @@
 import kotlinx.serialization.Serializable
-import GamePath.*
 
 @Serializable
 data class MainConfig(
     var mode: GameMode = GameMode.STARFIELD,
     var chunkSize: Int = 5,
     var apiKey: String? = null,
-    var useMyDocs: Boolean = false,
     var verbose: Boolean = false,
     var autoDeploy: Boolean = true,
     var logging: Boolean = true,
@@ -15,8 +13,8 @@ data class MainConfig(
 
 @Serializable
 data class GameConfig(
-    var useMyDocs: Boolean = false,
     var categories: Map<Int, String> = mapOf(),
+    var defaultDeployTarget: PathType = PathType.DATA,
     val paths: MutableMap<String, String> = mutableMapOf(),
 ) {
     operator fun get(type: String) = paths[type.uppercase()]
