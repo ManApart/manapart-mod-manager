@@ -72,7 +72,7 @@ fun detectStagingChanges(stageFolder: File): StageChange {
     val stagedFiles = stageFolder.listFiles() ?: arrayOf()
     val stagedNames = stagedFiles.map { it.nameWithoutExtension.lowercase() }
     val stagedExtensions = stagedFiles.map { it.extension }
-    val dataTopLevelNames = listOf("textures", "music", "sound", "meshes", "video", "sfse_readme", "sfse")
+    val dataTopLevelNames = listOf("textures", "music", "sound", "meshes", "video")
     val dataTopLevelExtensions = listOf("esp", "esm", "ba2")
     val nestableExtensions = listOf("pak")
     val validTopLevelFiles = listOf("engine")
@@ -81,7 +81,7 @@ fun detectStagingChanges(stageFolder: File): StageChange {
     val validTopLevelFolders = if (gameMode == GameMode.STARFIELD) validTopLevelFoldersSF else validTopLevelFoldersOR
     val firstFile = stagedFiles.firstOrNull()
     val hasNested = firstFile != null && firstFile.isDirectory
-    val nestedFiles = if (hasNested) firstFile?.listFiles() ?: arrayOf() else arrayOf()
+    val nestedFiles = if (hasNested) firstFile.listFiles() ?: arrayOf() else arrayOf()
     return when {
         stagedFiles.isEmpty() -> StageChange.NO_FILES
         stagedNames.any { validTopLevelFiles.contains(it) } -> StageChange.NONE
@@ -92,7 +92,6 @@ fun detectStagingChanges(stageFolder: File): StageChange {
         stagedNames.any { validTopLevelFolders.contains(it) } -> StageChange.NONE
         stagedExtensions.any { dataTopLevelExtensions.contains(it) } -> StageChange.NEST_IN_DATA
         stagedExtensions.any { "pak" == it } -> StageChange.NEST_IN_PAK
-        firstFile?.isDirectory ?: false && firstFile?.nameWithoutExtension?.startsWith("sfse_") ?: false -> StageChange.UNNEST
         hasNested && nestedFiles.map { it.nameWithoutExtension.lowercase() }.contains("data") -> StageChange.UNNEST
         stagedFiles.size == 1 && stagedFiles.first().extension == "dll" -> StageChange.NEST_IN_WIN64
         stagedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.ADD_TOP_FOLDER

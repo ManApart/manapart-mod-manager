@@ -68,7 +68,7 @@ fun List<Mod>.validate() {
 
     addDupeIds(errorMap)
     addDupeFilenames(errorMap)
-    detectStagingIssues(errorMap)
+    detectStagingIssues(errorMap, helpMessages)
     detectDupePlugins()
     detectIncorrectCasing(errorMap)
     modsWithFiles.checkHasFiles(errorMap)
@@ -124,7 +124,8 @@ private fun List<Mod>.addDupeFilenames(
 
 
 private fun List<Mod>.detectStagingIssues(
-    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
+    helpMessages: MutableSet<String>
 ) {
     forEach { mod ->
         val stageFolder = File(mod.filePath)
@@ -133,18 +134,21 @@ private fun List<Mod>.detectStagingIssues(
                 StageChange.UNKNOWN -> {
                     if (!mod.hasTag(Tag.SKIP_VALIDATE)) {
                         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
-                        errorMap[mod.index]?.second?.add("Unable to guess folder path. You should open the staging folder and make sure it was installed correctly.")
+                        errorMap[mod.index]?.second?.add("Unable to guess folder path.")
+                        helpMessages.add("Open the staging folder for unguessed paths and make sure it was installed correctly. Or change the deploy target.")
                     }
                 }
 
                 StageChange.FOMOD -> {
                     errorMap.putIfAbsent(mod.index, mod to mutableListOf())
-                    errorMap[mod.index]?.second?.add("FOMOD detected. You should open the staging folder and pick options yourself.")
+                    errorMap[mod.index]?.second?.add("FOMOD detected.")
+                    helpMessages.add("Open the staging folder of any FOMODs and pick options yourself.")
                 }
 
                 StageChange.NO_FILES -> {
                     errorMap.putIfAbsent(mod.index, mod to mutableListOf())
                     errorMap[mod.index]?.second?.add("No files found in stage folder.")
+                        helpMessages.add("Mod without files should be refreshed or potentially have its deployment target changed.")
                 }
 
                 else -> {}
@@ -206,7 +210,7 @@ private fun Map<Mod, List<File>>.detectTopLevelFiles(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
     helpMessages: MutableSet<String>
 ) {
-    val excludeList = listOf("sfse_loader.exe", "Engine.ini")
+    val excludeList = listOf("Engine.ini")
     val goodPaths = (gameMode.generatedPaths.values.mapNotNull { it.suffix.split("/").getOrNull(1) } + gameMode.deployedModPath.drop(1)).filter { it.isNotBlank() }.toSet()
     filter { (mod, files) ->
         val parent = files.first().path.split("/").take(2).joinToString("/") + "/"
@@ -216,7 +220,7 @@ private fun Map<Mod, List<File>>.detectTopLevelFiles(
     }.forEach { (mod, _) ->
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Has files outside the Data folder")
-        helpMessages.add("To fix files outside of data, either skip validating this mod, or use local to open it and manually fix file structure")
+        helpMessages.add("To fix files outside of data, change the deployment target, skip validating this mod, or use local to open it and manually fix file structure")
     }
 }
 

@@ -113,6 +113,7 @@ fun deleteLink(target: PathType, gamePath: String, modFiles: Map<String, File>) 
 
 private fun getGameFile(target: PathType, gamePath: String): File {
     val parent = if (target == PathType.DATA) {
+        //Since we require data files under the data folder, strip off the double data folder
         gameMode.path(target)!!.split("/").dropLast(1).joinToString("/")
     } else gameMode.path(target)
     return File("$parent/$gamePath")
