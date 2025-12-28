@@ -1,6 +1,8 @@
 package commands.deploy
 
 import Mod
+import PathType
+import commands.deploy.addModFiles
 import cyan
 import gameConfig
 import gameMode
@@ -27,23 +29,11 @@ val deployUsage = """
 fun deploy(command: String, args: List<String>) {
     val files = getAllModFiles(true)
     when {
-        args.firstOrNull() == "dryrun" -> deployDryRun(command, files)
+        //TODO - not seeing plugins
+        args.firstOrNull() == "dryrun" -> deployDryRun(files)
         args.firstOrNull() == "overrides" -> showOverrides()
         files.isEmpty() -> println(yellow("No mod files found"))
-        else -> {
-            getDisabledModPaths().forEach { deleteLink(it, files) }
-            files.entries.forEach { (gamePath, modFile) -> makeLink(gamePath, modFile) }
-            deployPlugins(files)
-            println(cyan("Deployed ${files.size} files"))
-        }
-    }
-}
-
-private fun getDisabledModPaths(): List<String> {
-    return toolData.mods.filter { !it.enabled }.flatMap { mod ->
-        val modRoot = File(mod.filePath).absolutePath + "/"
-        mod.getModFiles()
-            .map { it.absolutePath.replace(modRoot, "") }
+        else -> getAllModFilesByTarget(true).entries.forEach { (target, f) -> doDeploy(f, target) }
     }
 }
 
@@ -53,6 +43,28 @@ private fun getAllModFiles(logMissing: Boolean = false): Map<String, File> {
     return mappings
 }
 
+private fun getAllModFilesByTarget(logMissing: Boolean = false): Map<PathType, Map<String, File>> {
+    val mappings = mutableMapOf<PathType, MutableMap<String, File>>()
+    toolData.mods.filter { it.enabled }.sortedBy { it.loadOrder }.forEach {
+        mappings.putIfAbsent(it.deployTarget, mutableMapOf())
+        mappings[it.deployTarget]?.addModFiles(it, logMissing)
+    }
+    return mappings
+}
+
+private fun doDeploy(files: Map<String, File>, target: PathType) {
+    getDisabledModPaths(target).forEach { deleteLink(target, it, files) }
+    files.entries.forEach { (gamePath, modFile) -> makeLink(modFile, target, gamePath) }
+    deployPlugins(files)
+    println(cyan("Deployed ${files.size} files"))
+}
+
+private fun getDisabledModPaths(target: PathType): List<String> {
+    return toolData.mods.filter { !it.enabled && it.deployTarget == target }.flatMap { mod ->
+        mod.getModPaths()
+    }
+}
+
 private fun MutableMap<String, File>.addModFiles(mod: Mod, logMissing: Boolean = false) {
     val modRoot = File(mod.filePath).absolutePath + "/"
     mod.getModFiles().also { if (logMissing && it.isEmpty()) println(yellow("No files found for ${mod.name}")) }.forEach { file ->
@@ -60,8 +72,10 @@ private fun MutableMap<String, File>.addModFiles(mod: Mod, logMissing: Boolean =
     }
 }
 
-fun makeLink(gamePath: String, modFile: File) {
-    val gameFile = File(gameMode.usedGamePath(gamePath, gameConfig.useMyDocs) + "/$gamePath")
+fun makeLink(modFile: File, target: PathType, gamePath: String) {
+    //TODO - get game file using target
+    val gameFile = File(gameMode.path(target) + "/$gamePath")
+//    val gameFile = File(gameMode.usedGamePath(gamePath, gameConfig.useMyDocs) + "/$gamePath")
     gameFile.parentFile.mkdirs()
     if (Files.isSymbolicLink(gameFile.toPath())) {
         val existingLink = Files.readSymbolicLink(gameFile.toPath())
@@ -85,8 +99,10 @@ fun makeLink(gamePath: String, modFile: File) {
     }
 }
 
-fun deleteLink(gamePath: String, modFiles: Map<String, File>) {
-    val gameFile = File(gameMode.usedGamePath(gamePath, gameConfig.useMyDocs) + "/$gamePath")
+fun deleteLink(target: PathType, gamePath: String, modFiles: Map<String, File>) {
+    //TODO - get game file using target
+//    val gameFile = File(gameMode.usedGamePath(gamePath, gameConfig.useMyDocs) + "/$gamePath")
+    val gameFile = File(gameMode.path(target) + "/$gamePath")
     if (!modFiles.contains(gamePath) && Files.isSymbolicLink(gameFile.toPath())) {
         verbose("Delete: $gamePath")
         gameFile.delete()

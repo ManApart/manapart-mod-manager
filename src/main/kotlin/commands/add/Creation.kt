@@ -214,7 +214,7 @@ fun rmCreation(mod: Mod, force: Boolean = false) {
         mod.getModFiles()
             .forEach { file ->
                 val linkFile = file.absolutePath.replace(modRoot, "")
-                deleteLink(linkFile, mapOf())
+                deleteLink(mod.deployTarget,linkFile, mapOf())
                 val destFile = File(file.absolutePath.replace(modRoot, gameConfig[GAME] + "/"))
                 if (!destFile.exists()) {
                     Files.move(file.toPath(), destFile.toPath())

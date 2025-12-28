@@ -1,17 +1,18 @@
 package commands.deploy
 
 import Mod
+import PathType
 import cyan
 import toolData
 import java.io.File
 
-fun deployDryRun(command: String, files: Map<String, File>) {
+fun deployDryRun(files: Map<String, File>) {
     getAnnotatedModFiles().forEach { entry ->
         println(entry.key)
         val winner = entry.value.first()
-        println("\tDeploy: (${winner.loadOrder}) ${winner.index} ${winner.name}")
+        println("\tDeploy: (${winner.loadOrder}) ${winner.index} ${winner.name} (${winner.deployTarget})")
         entry.value.drop(1).takeIf { it.isNotEmpty() }?.let { others ->
-            println("\tNot used: ${others.joinToString { "(${it.loadOrder}) " + it.idName() }}")
+            println("\tNot used: ${others.joinToString { "(${it.loadOrder}) ${it.idName()} (${it.deployTarget})" }}")
         }
     }
     println()

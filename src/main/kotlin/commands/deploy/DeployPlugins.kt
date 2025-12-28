@@ -1,6 +1,7 @@
 package commands.deploy
 
 import GameMode
+import PathType
 import cyan
 import gameMode
 import yellow
@@ -22,7 +23,7 @@ fun deployPluginsDryRun(files: Map<String, File>) {
 }
 
 private fun createPluginsContent(files: Map<String, File>): String {
-    val pluginList = files.entries.filter { it.value.extension.lowercase() in listOf("esp", "esm", "esl") }.map { it.value.name }
+    val pluginList = files.values.filter { it.extension.lowercase() in listOf("esp", "esm", "esl") }.map { it.name }
     val pluginLines = pluginList.joinToString("\n") {
         if (gameMode == GameMode.STARFIELD) "|*$it" else "|$it"
     }
