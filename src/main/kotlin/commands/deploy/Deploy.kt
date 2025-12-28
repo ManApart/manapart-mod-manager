@@ -73,9 +73,7 @@ private fun MutableMap<String, File>.addModFiles(mod: Mod, logMissing: Boolean =
 }
 
 fun makeLink(modFile: File, target: PathType, gamePath: String) {
-    //TODO - get game file using target
-    val gameFile = File(gameMode.path(target) + "/$gamePath")
-//    val gameFile = File(gameMode.usedGamePath(gamePath, gameConfig.useMyDocs) + "/$gamePath")
+    val gameFile = getGameFile(target, gamePath)
     gameFile.parentFile.mkdirs()
     if (Files.isSymbolicLink(gameFile.toPath())) {
         val existingLink = Files.readSymbolicLink(gameFile.toPath())
@@ -100,9 +98,7 @@ fun makeLink(modFile: File, target: PathType, gamePath: String) {
 }
 
 fun deleteLink(target: PathType, gamePath: String, modFiles: Map<String, File>) {
-    //TODO - get game file using target
-//    val gameFile = File(gameMode.usedGamePath(gamePath, gameConfig.useMyDocs) + "/$gamePath")
-    val gameFile = File(gameMode.path(target) + "/$gamePath")
+    val gameFile = getGameFile(target, gamePath)
     if (!modFiles.contains(gamePath) && Files.isSymbolicLink(gameFile.toPath())) {
         verbose("Delete: $gamePath")
         gameFile.delete()
@@ -113,4 +109,11 @@ fun deleteLink(target: PathType, gamePath: String, modFiles: Map<String, File>) 
             Files.move(backedUpFile.toPath(), gameFile.toPath())
         }
     }
+}
+
+private fun getGameFile(target: PathType, gamePath: String): File {
+    val parent = if (target == PathType.DATA) {
+        gameMode.path(target)!!.split("/").dropLast(1).joinToString("/")
+    } else gameMode.path(target)
+    return File("$parent/$gamePath")
 }

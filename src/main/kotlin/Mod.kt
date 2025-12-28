@@ -15,7 +15,7 @@ data class Mod(
     var id: Int? = null,
     var plugins: List<String> = emptyList(),
     var creationId: String? = null,
-    var deployTarget: PathType = PathType.GAME,
+    var deployTarget: PathType = PathType.DATA,
     var downloadPath: String? = null,
     var fileId: Int? = null,
     var latestFileId: Int? = null,

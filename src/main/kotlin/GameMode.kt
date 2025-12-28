@@ -7,7 +7,6 @@ enum class GameMode(
     val deployedModPath: String,
     val modFolder: String,
     val urlName: String,
-    val usedGamePath: (String, Boolean) -> String,
     val generatedPaths: Map<PathType, GeneratedPath>
 ) {
     STARFIELD(
@@ -19,7 +18,6 @@ enum class GameMode(
         "/Data",
         "starfield-mods",
         "starfield",
-        { modGamePath, useMyDocs -> (if (useMyDocs && modGamePath.startsWith("Data", true)) PathType.APP_DATA else PathType.GAME).let { gameMode.path(it)!! } },
         starfieldPaths(),
     ),
     OBLIVION_REMASTERED(
@@ -31,7 +29,6 @@ enum class GameMode(
         "/Content/Dev/ObvData/Data",
         "oblivion-remastered-mods",
         "oblivionremastered",
-        { _, _ -> gameMode.path(PathType.GAME)!! },
         oblivionRemasteredPaths(),
     );
 
