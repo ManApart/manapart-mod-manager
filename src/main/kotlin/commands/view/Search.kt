@@ -34,6 +34,7 @@ val searchModsUsage = """
     search missing
     search nocat
     search upgrade
+    search fomod
 """.trimIndent()
 
 fun searchMods(command: String, args: List<String> = listOf()) {
@@ -46,42 +47,44 @@ fun searchMods(persist: Boolean, args: List<String> = listOf()) {
         display(toolData.mods.map { it to true })
         return
     }
-    val enabled = when {
-        args.contains("enabled") -> true
-        args.contains("disabled") -> false
-        else -> null
-    }
-    val staged = when {
-        args.contains("staged") -> true
-        args.contains("unstaged") -> false
-        else -> null
-    }
-    val endorsed = when {
-        args.contains("endorsed") -> true
-        args.contains("abstained") -> false
-        else -> null
-    }
-    val unendorsed = args.contains("unendorsed")
-    val upgrade = args.contains("upgrade")
-    val missing = if(args.contains("missing")) true else null
-    val missingCat = if(args.contains("nocat")) true else null
-    val id = args.firstOrNull { it.toIntOrNull() != null }
-    val flagList = listOf("enabled", "disabled", "staged", "unstaged", "endorsed", "abstained", "unendorsed", "tag", "name", "category", "upgrade")
-    val search = args.filter { !flagList.contains(it) && it.toIntOrNull() == null }.joinToString(" ").lowercase()
+    if (args.contains("fomod")) searchFomods(persist) else {
+        val enabled = when {
+            args.contains("enabled") -> true
+            args.contains("disabled") -> false
+            else -> null
+        }
+        val staged = when {
+            args.contains("staged") -> true
+            args.contains("unstaged") -> false
+            else -> null
+        }
+        val endorsed = when {
+            args.contains("endorsed") -> true
+            args.contains("abstained") -> false
+            else -> null
+        }
+        val unendorsed = args.contains("unendorsed")
+        val upgrade = args.contains("upgrade")
+        val missing = if (args.contains("missing")) true else null
+        val missingCat = if (args.contains("nocat")) true else null
+        val id = args.firstOrNull { it.toIntOrNull() != null }
+        val flagList = listOf("enabled", "disabled", "staged", "unstaged", "endorsed", "abstained", "unendorsed", "tag", "name", "category", "upgrade")
+        val search = args.filter { !flagList.contains(it) && it.toIntOrNull() == null }.joinToString(" ").lowercase()
 
-    val searchType = when {
-        args.getOrNull(0) == "name" -> SearchType.NAME
-        args.getOrNull(0) == "category" -> SearchType.CATEGORY
-        args.getOrNull(0) == "tag" -> SearchType.TAG
-        else -> SearchType.ALL
-    }
+        val searchType = when {
+            args.getOrNull(0) == "name" -> SearchType.NAME
+            args.getOrNull(0) == "category" -> SearchType.CATEGORY
+            args.getOrNull(0) == "tag" -> SearchType.TAG
+            else -> SearchType.ALL
+        }
 
-    val mods = toolData.mods.map { mod ->
-        val displayed = mod.show && mod.isDisplayed(enabled, staged, missing, missingCat, upgrade, id, endorsed, unendorsed, searchType, search)
-        if (persist) mod.show = displayed
-        mod to displayed
+        val mods = toolData.mods.map { mod ->
+            val displayed = mod.show && mod.isDisplayed(enabled, staged, missing, missingCat, upgrade, id, endorsed, unendorsed, searchType, search)
+            if (persist) mod.show = displayed
+            mod to displayed
+        }
+        display(mods)
     }
-    display(mods)
 }
 
 private fun Mod.isDisplayed(
@@ -115,4 +118,13 @@ private fun Mod.stringSearch(kind: SearchType, search: String): Boolean {
             name.contains(search) || (category()?.lowercase()?.contains(search) ?: false) || tags.any { tag -> tag.lowercase().contains(search) }
         }
     }
+}
+
+private fun searchFomods(persist: Boolean) {
+    val mods = toolData.mods.map { mod ->
+        val displayed = mod.show && File(mod.filePath).listFiles().map { it.name.lowercase() }.contains("fomod")
+        if (persist) mod.show = displayed
+        mod to displayed
+    }
+    display(mods)
 }

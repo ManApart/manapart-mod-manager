@@ -21,6 +21,7 @@ val filterUsage = """
     filter abstained
     filter missing - show missing ids
     filter upgrade
+    filter fomod
 """.trimIndent()
 
 fun filterMods(command: String, args: List<String> = listOf()) {
