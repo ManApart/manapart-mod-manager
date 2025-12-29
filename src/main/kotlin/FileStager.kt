@@ -44,17 +44,22 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
         StageChange.NO_FILES -> println(yellow("No staged files found for ${mod.name}"))
         StageChange.CAPITALIZE -> capitalizeData(stageFolder)
         StageChange.NEST_IN_DATA -> nestInPrefix(mod.name, gameMode.deployedModPath, stageFolder, stagedFiles)
-        StageChange.NEST_IN_WIN64 -> mod.deployTarget = PathType.WIN64
-        StageChange.NEST_IN_PAK -> mod.deployTarget = PathType.PAKS
-        StageChange.NEST_IN_UE4SS -> mod.deployTarget = PathType.UE4SS_Mods
-        StageChange.UNNEST -> unNestFiles(mod.name, stageFolder, stagedFiles)
+        StageChange.USE_WIN64 -> mod.setDeployTarget(PathType.WIN64)
+        StageChange.USE_PAK -> mod.setDeployTarget(PathType.PAKS)
+        StageChange.USE_UE4SS -> mod.setDeployTarget(PathType.UE4SS_Mods)
+        StageChange.USE_OBSE -> {
+            mod.setDeployTarget(PathType.OBSE_PlUGINS)
+            fullyUnnestLeafFiles(stageFolder)
+        }
+
+        StageChange.UNNEST -> unNestFiles(stageFolder, stagedFiles)
         StageChange.ADD_TOP_FOLDER -> {
             nestInPrefix(mod.name, "/" + stageFolder.name, stageFolder, stagedFiles)
             fixFolderPath(mod, stageFolder, count + 1)
         }
 
         StageChange.REMOVE_TOP_FOLDER -> {
-            unNestFiles(mod.name, stageFolder, stagedFiles)
+            unNestFiles(stageFolder, stagedFiles)
             fixFolderPath(mod, stageFolder, count + 1)
         }
 
@@ -64,7 +69,12 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
     properlyCasePaths(stageFolder)
 }
 
-enum class StageChange { NONE, NEST_IN_DATA, NEST_IN_WIN64, NEST_IN_PAK, NEST_IN_UE4SS, ADD_TOP_FOLDER, REMOVE_TOP_FOLDER, UNNEST, FOMOD, CAPITALIZE, NO_FILES, UNKNOWN }
+private fun Mod.setDeployTarget(target: PathType) {
+    deployTarget = target
+    save()
+}
+
+enum class StageChange { NONE, NEST_IN_DATA, USE_WIN64, USE_PAK, USE_UE4SS, USE_OBSE, ADD_TOP_FOLDER, REMOVE_TOP_FOLDER, UNNEST, FOMOD, CAPITALIZE, NO_FILES, UNKNOWN }
 
 fun detectStagingChanges(stageFolder: File): StageChange {
     val stagedFiles = stageFolder.listFiles() ?: arrayOf()
@@ -78,32 +88,32 @@ fun detectStagingChanges(stageFolder: File): StageChange {
     val firstFile = stagedFiles.firstOrNull()
     val hasNested = firstFile != null && firstFile.isDirectory
     val nestedFiles = if (hasNested) firstFile.listFiles() ?: arrayOf() else arrayOf()
+    val allFiles = lazy { stageFolder.getFiles() }
     return when {
         stagedFiles.isEmpty() -> StageChange.NO_FILES
         stagedNames.any { validTopLevelFiles.contains(it) } -> StageChange.NONE
         stagedFiles.any { validTopLevelFolders.contains(it.nameWithoutExtension) } -> StageChange.CAPITALIZE
-        stagedNames.contains("ue4ss") -> StageChange.NEST_IN_WIN64
         stagedNames.any { dataTopLevelNames.contains(it) } -> StageChange.NEST_IN_DATA
-        stagedNames.any { it.startsWith("obse64") } -> StageChange.NEST_IN_WIN64
+        stagedNames.any { it.startsWith("obse64") } -> StageChange.USE_WIN64
         stagedNames.any { validTopLevelFolders.contains(it) } -> StageChange.NONE
         stagedExtensions.any { dataTopLevelExtensions.contains(it) } -> StageChange.NEST_IN_DATA
-        stagedExtensions.any { "pak" == it } -> StageChange.NEST_IN_PAK
+        stagedExtensions.any { "pak" == it } -> StageChange.USE_PAK
         hasNested && nestedFiles.map { it.nameWithoutExtension.lowercase() }.contains("data") -> StageChange.UNNEST
-        stagedFiles.size == 1 && stagedFiles.first().extension == "dll" -> StageChange.NEST_IN_WIN64
+        stagedFiles.size == 1 && stagedFiles.first().extension == "dll" -> StageChange.USE_WIN64
         stagedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.ADD_TOP_FOLDER
         hasNested && stagedFiles.size == 1 && nestedFiles.map { it.extension }.any { dataTopLevelExtensions.contains(it) || nestableExtensions.contains(it) } -> StageChange.REMOVE_TOP_FOLDER
         hasNested && stagedFiles.size == 1 && nestedFiles.map { it.nameWithoutExtension.lowercase() }
             .any { validTopLevelFolders.contains(it) || validTopLevelFiles.contains(it) } -> StageChange.REMOVE_TOP_FOLDER
 
-        hasNested && stagedFiles.size == 1 && nestedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.NEST_IN_UE4SS
+        hasNested && stagedFiles.size == 1 && nestedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.USE_UE4SS
         stagedNames.contains("fomod") -> StageChange.FOMOD
+        allFiles.value.any { it.absolutePath.lowercase().contains("obse/plugins") } -> StageChange.USE_OBSE
         hasNested && stagedFiles.size == 1 -> StageChange.REMOVE_TOP_FOLDER
         else -> StageChange.UNKNOWN
     }
 }
 
-fun unNestFiles(modName: String, stageFolder: File, stagedFiles: Array<File>) {
-    println("Unnesting files in data for $modName")
+fun unNestFiles(stageFolder: File, stagedFiles: Array<File>) {
     val topFolder = stagedFiles.first()
     try {
         topFolder.listFiles()?.forEach { nested ->
@@ -125,6 +135,13 @@ private fun unNest(stageFolderPath: String, nested: File, topPath: String) {
             unNest(stageFolderPath, moreNested, topPath)
         }
     }
+}
+
+fun fullyUnnestLeafFiles(stageFolder: File) {
+    stageFolder.getFiles().filter { it.isFile }.forEach {
+        Files.move(it.toPath(), Path(stageFolder.path + "/" + it.name), StandardCopyOption.REPLACE_EXISTING)
+    }
+    stageFolder.listFiles()!!.filter { it.isDirectory }.forEach { it.deleteRecursively() }
 }
 
 fun nestInPrefix(modName: String, prefix: String, stageFolder: File, stagedFiles: Array<File>) {

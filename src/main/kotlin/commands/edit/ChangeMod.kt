@@ -24,6 +24,7 @@ val changeUsage = """
     mod <index> name <new name>
     mod <index> category <new category id>
     mod <index> deploytarget <new deploy target>
+    mod <index> dt <new deploy target>
 """.trimIndent()
 
 fun moveMod(command: String, args: List<String>) {
@@ -38,7 +39,7 @@ fun changeMod(command: String, args: List<String>) {
         args.size == 3 && args[1] == "id" -> updateId(i, args.last().toInt())
         args.size == 3 && args[1] == "file" -> updateFile(i, args.last())
         args.size == 3 && args[1] == "name" -> updateName(i, args.last())
-        args.size == 3 && args[1] == "deploytarget" -> updateDeployTarget(i, args.last())
+        args.size == 3 && (args[1] == "deploytarget" || args[1] == "dt") -> updateDeployTarget(i, args.last())
         args.size == 3 && args[1] == "category" && args.last().toIntOrNull() != null -> changeCategory(i, args.last().toInt())
         else -> println(changeDescription)
     }

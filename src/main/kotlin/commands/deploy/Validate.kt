@@ -1,13 +1,14 @@
 package commands.deploy
 
+import GameMode
 import Mod
 import PathType
 import StageChange
 import commands.add.Creation
-import commands.edit.Tag
 import commands.add.getExternalMods
 import commands.add.parseCreationCatalog
 import commands.add.parseCreationPlugins
+import commands.edit.Tag
 import cyan
 import detectStagingChanges
 import doCommand
@@ -62,7 +63,8 @@ fun List<Mod>.validate() {
     val errorMap = mutableMapOf<Int, Pair<Mod, MutableList<String>>>()
     val nonModErrors = mutableListOf<String>()
     val helpMessages = mutableSetOf<String>()
-    val modsWithFiles = associateWith { it.getModFiles() }
+    val modsToFiles = associateWith { it.getModFiles() }
+    val modsWithFiles = modsToFiles.filter { it.value.isNotEmpty() }
     val creationCatalog = if (gameMode == GameMode.STARFIELD) parseCreationCatalog() else mapOf()
     val creations = if (gameMode == GameMode.STARFIELD) parseCreationPlugins(creationCatalog) else listOf()
     val externalMods = if (gameMode == GameMode.STARFIELD) getExternalMods(creations) else mapOf()
@@ -72,9 +74,11 @@ fun List<Mod>.validate() {
     detectStagingIssues(errorMap, helpMessages)
     detectDupePlugins()
     detectIncorrectCasing(errorMap)
-    modsWithFiles.checkHasFiles(errorMap)
-    modsWithFiles.addEmptyEnabled(errorMap)
-    modsWithFiles.filter { it.value.isNotEmpty() }.detectTopLevelFiles(errorMap, helpMessages)
+    modsToFiles.checkHasFiles(errorMap)
+    modsToFiles.addEmptyEnabled(errorMap)
+    modsWithFiles.detectTopLevelNonDataFiles(errorMap, helpMessages)
+    modsWithFiles.noSubDirectories(errorMap, helpMessages)
+    detectBadUE4Mods(errorMap,helpMessages)
     checkPlugins(errorMap, helpMessages)
 
     if (gameMode == GameMode.STARFIELD) {
@@ -207,7 +211,7 @@ private fun Map<Mod, List<File>>.checkHasFiles(
     }
 }
 
-private fun Map<Mod, List<File>>.detectTopLevelFiles(
+private fun Map<Mod, List<File>>.detectTopLevelNonDataFiles(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
     helpMessages: MutableSet<String>
 ) {
@@ -223,6 +227,32 @@ private fun Map<Mod, List<File>>.detectTopLevelFiles(
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Has files outside the Data folder")
         helpMessages.add("To fix files outside of data, change the deployment target (see mod command), skip validating this mod, or use local to open it and manually fix file structure")
+    }
+}
+
+private fun Map<Mod, List<File>>.noSubDirectories(
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
+    helpMessages: MutableSet<String>
+) {
+    val relevantTargets = listOf(PathType.OBSE_PlUGINS, PathType.PAKS)
+    filter { (mod, files) -> mod.deployTarget in relevantTargets  && files.any { it.isDirectory }}.forEach { (mod, _) ->
+        errorMap.putIfAbsent(mod.index, mod to mutableListOf())
+        errorMap[mod.index]?.second?.add("Has sub folders that shouldn't exist")
+        helpMessages.add("OBSE plugins and paks should be at the root level, without subfolders")
+    }
+}
+
+private fun List<Mod>.detectBadUE4Mods(
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
+    helpMessages: MutableSet<String>
+) {
+    filter { it.deployTarget == PathType.UE4SS_Mods }.filter { mod ->
+        val files = File(mod.filePath).listFiles()
+        files.size != 1 || files.first().listFiles().none { it.name.lowercase() == "enabled.txt" }
+    }.forEach { mod ->
+        errorMap.putIfAbsent(mod.index, mod to mutableListOf())
+        errorMap[mod.index]?.second?.add("Is an incorrectly set up UE4SS mod")
+        helpMessages.add("UE4SS mods should have the mod folder at the top level. Inside that folder there should be an enabled.txt file")
     }
 }
 
@@ -269,7 +299,7 @@ private fun Map<Mod, List<File>>.addEmptyEnabled(
 private fun printErrors(errorMap: Map<Int, Pair<Mod, MutableList<String>>>) {
     errorMap.entries.forEach { (i, errorList) ->
         val (mod, errors) = errorList
-        println("$i ${yellow(mod.name)} has issues:")
+        println("$i (${mod.id}) ${yellow(mod.name)} has issues:")
         errors.forEach { error ->
             println("\t$error")
         }
