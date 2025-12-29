@@ -30,7 +30,7 @@ fun refresh(command: String, args: List<String>) {
 
 private fun List<Mod>.refreshMods() {
     filter { it.creationId == null }
-        .also { println(cyan("Refreshing ${it.size} mods")) }
-        .forEach { refreshMod(it) }
-    println(cyan("Done Refreshing"))
+        .also { if (it.isEmpty()) println("No mods to refresh (Creations are not refreshed)") else println(cyan("Refreshing ${it.size} mods")) }
+        .also { list -> list.forEach { refreshMod(it) } }
+        .also { if (it.isNotEmpty()) println(cyan("Done Refreshing")) }
 }
