@@ -1,7 +1,9 @@
 package commands
 
+import GameConfig
 import Mod
 import commands.deploy.setModOrder
+import gameConfig
 import org.junit.jupiter.api.BeforeAll
 import testingMode
 import kotlin.test.Test
@@ -13,6 +15,7 @@ class OrderTest {
         @BeforeAll
         fun setup() {
             testingMode = true
+            gameConfig = GameConfig()
         }
     }
 
