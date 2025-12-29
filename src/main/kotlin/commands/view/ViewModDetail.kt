@@ -5,6 +5,8 @@ import Mod
 import Table
 import capitalize
 import commands.getIndicesOrRange
+import jsonMapper
+import kotlinx.serialization.json.JsonObject
 import toolData
 
 val detailDescription = """
@@ -29,9 +31,8 @@ private fun viewDetail(mod: Mod) {
         Column("Field", 20),
         Column("Value", 60),
     )
-    val data = mod.toString().drop(4).dropLast(1).split(", ").map { l ->
-        val parts = l.split("=")
-        mapOf("Field" to parts[0].capitalize(), "Value" to parts[1])
+    val data = jsonMapper.decodeFromString<JsonObject>(jsonMapper.encodeToString(mod)).entries.map { (key, value) ->
+        mapOf("Field" to key, "Value" to value.toString())
     } + listOf(mapOf("Field" to "Category Name", "Value" to (mod.category() ?: "")))
     println(mod.name)
     Table(columns, data.sortedBy { it["Field"] }).print()

@@ -29,7 +29,8 @@ fun refresh(command: String, args: List<String>) {
 }
 
 private fun List<Mod>.refreshMods() {
-    also { println(cyan("Refreshing ${it.size} mods")) }
+    filter { it.creationId == null }
+        .also { println(cyan("Refreshing ${it.size} mods")) }
         .forEach { refreshMod(it) }
     println(cyan("Done Refreshing"))
 }
