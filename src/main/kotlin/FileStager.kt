@@ -3,7 +3,7 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import kotlin.io.path.Path
 
-fun stageMod(sourceFile: File, stageFolder: File, modName: String): Boolean {
+fun stageMod(sourceFile: File, stageFolder: File, mod: Mod): Boolean {
     stageFolder.mkdirs()
     stageFolder.backupIni()
     stageFolder.listFiles()?.forEach { it.deleteRecursively() }
@@ -28,41 +28,39 @@ fun stageMod(sourceFile: File, stageFolder: File, modName: String): Boolean {
             false
         }
     }.also { success ->
-        if (success) {
-            fixFolderPath(modName, stageFolder)
-        }
+        if (success) fixFolderPath(mod, stageFolder)
     }
 }
 
-private fun fixFolderPath(modName: String, stageFolder: File, count: Int = 0) {
+private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
     val stagedFiles = stageFolder.listFiles() ?: arrayOf()
     val action = detectStagingChanges(stageFolder)
     if (count > 20) {
         println(yellow("Unable to fix folder path. You should open the staging folder and make sure it was installed correctly."))
         return
     }
+    if (action != StageChange.NONE) println("${mod.name}: $action")
     when (action) {
         StageChange.NONE -> {}
-        StageChange.NO_FILES -> println(yellow("No staged files found for $modName"))
+        StageChange.NO_FILES -> println(yellow("No staged files found for ${mod.name}"))
         StageChange.CAPITALIZE -> capitalizeData(stageFolder)
-        StageChange.NEST_IN_DATA -> nestInPrefix(modName, gameMode.deployedModPath, stageFolder, stagedFiles)
-        //TODO - instead of nesting, set deployment target
-        StageChange.NEST_IN_WIN64 -> nestInPrefix(modName, win64, stageFolder, stagedFiles)
-        StageChange.NEST_IN_PAK -> nestInPrefix(modName, paks, stageFolder, stagedFiles)
-        StageChange.NEST_IN_UE4SS -> nestInPrefix(modName, ue4ss, stageFolder, stagedFiles)
-        StageChange.UNNEST -> unNestFiles(modName, stageFolder, stagedFiles)
+        StageChange.NEST_IN_DATA -> nestInPrefix(mod.name, gameMode.deployedModPath, stageFolder, stagedFiles)
+        StageChange.NEST_IN_WIN64 -> mod.deployTarget = PathType.WIN64
+        StageChange.NEST_IN_PAK -> mod.deployTarget = PathType.PAKS
+        StageChange.NEST_IN_UE4SS -> mod.deployTarget = PathType.UE4SS_Mods
+        StageChange.UNNEST -> unNestFiles(mod.name, stageFolder, stagedFiles)
         StageChange.ADD_TOP_FOLDER -> {
-            nestInPrefix(modName, "/" + stageFolder.name, stageFolder, stagedFiles)
-            fixFolderPath(modName, stageFolder, count + 1)
+            nestInPrefix(mod.name, "/" + stageFolder.name, stageFolder, stagedFiles)
+            fixFolderPath(mod, stageFolder, count + 1)
         }
 
         StageChange.REMOVE_TOP_FOLDER -> {
-            unNestFiles(modName, stageFolder, stagedFiles)
-            fixFolderPath(modName, stageFolder, count + 1)
+            unNestFiles(mod.name, stageFolder, stagedFiles)
+            fixFolderPath(mod, stageFolder, count + 1)
         }
 
-        StageChange.FOMOD -> println(yellow("FOMOD detected for $modName.") + " You should open the staging folder and pick options yourself.")
-        else -> println(yellow("Unable to guess folder path for $modName.") + " You should open the staging folder and make sure it was installed correctly.")
+        StageChange.FOMOD -> println(yellow("FOMOD detected for ${mod.name}.") + " You should open the staging folder and pick options yourself.")
+        else -> println(yellow("Unable to guess folder path for ${mod.name}.") + " You should open the staging folder and make sure it was installed correctly.")
     }
     properlyCasePaths(stageFolder)
 }

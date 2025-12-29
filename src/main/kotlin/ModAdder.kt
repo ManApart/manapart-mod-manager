@@ -15,7 +15,7 @@ fun addModById(id: Int, fileId: Int? = null, forceRedownload: Boolean = false) {
     if (downloaded == null) {
         println(red("Failed to download ${mod.name}"))
     } else {
-        addModFile(mod, downloaded, mod.name, mod.latestVersion)
+        addModFile(mod, downloaded, mod.latestVersion)
     }
 }
 
@@ -34,7 +34,7 @@ fun refreshMod(mod: Mod, forceRedownload: Boolean = false, fileId: Int? = null) 
     if (downloaded == null) {
         println(red("Failed to download ${mod.name}"))
     } else {
-        addModFile(mod, downloaded, mod.name, mod.latestVersion)
+        addModFile(mod, downloaded, mod.latestVersion)
     }
 }
 
@@ -134,7 +134,7 @@ fun addModByNexusProtocol(url: String) {
     if (downloaded == null) {
         println(red("Failed to download ${mod.name}"))
     } else {
-        addModFile(mod, downloaded, modName)
+        addModFile(mod, downloaded)
         logFetch(listOf(request.modId))
     }
 }
@@ -154,11 +154,11 @@ fun addModByFile(filePath: String, nameOverride: String?) {
         }
     }
 
-    addModFile(mod, sourceFile, name)
+    addModFile(mod, sourceFile)
     logFetch(name)
 }
 
-fun addModFile(mod: Mod, sourceFile: File, modName: String, version: String? = mod.latestVersion) {
+fun addModFile(mod: Mod, sourceFile: File, version: String? = mod.latestVersion) {
     if (!sourceFile.exists()) {
         println(red("Could not find ${sourceFile.absolutePath}"))
         return
@@ -169,7 +169,7 @@ fun addModFile(mod: Mod, sourceFile: File, modName: String, version: String? = m
     }
     val stageFile = File(mod.filePath)
     val stageExists = stageFile.exists()
-    if (stageMod(sourceFile, stageFile, modName)) {
+    if (stageMod(sourceFile, stageFile, mod)) {
         mod.refreshPlugins()
         if (stageExists) {
             println("Updated (${mod.index}) ${mod.name}")
