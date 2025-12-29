@@ -46,6 +46,7 @@ private fun fixFolderPath(modName: String, stageFolder: File, count: Int = 0) {
         StageChange.NO_FILES -> println(yellow("No staged files found for $modName"))
         StageChange.CAPITALIZE -> capitalizeData(stageFolder)
         StageChange.NEST_IN_DATA -> nestInPrefix(modName, gameMode.deployedModPath, stageFolder, stagedFiles)
+        //TODO - instead of nesting, set deployment target
         StageChange.NEST_IN_WIN64 -> nestInPrefix(modName, win64, stageFolder, stagedFiles)
         StageChange.NEST_IN_PAK -> nestInPrefix(modName, paks, stageFolder, stagedFiles)
         StageChange.NEST_IN_UE4SS -> nestInPrefix(modName, ue4ss, stageFolder, stagedFiles)

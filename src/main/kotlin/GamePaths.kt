@@ -74,10 +74,10 @@ fun oblivionRemasteredPaths(): Map<PathType, GeneratedPath> {
     return listOf(
         gamePath,
         jarPath,
-        GeneratedPath(DATA, listOf("data")) { gameConfig[GamePath.GAME] + GameMode.OBLIVION_REMASTERED.deployedModPath },
+        GeneratedPath(DATA, listOf("data")) { gameConfig[GamePath.GAME] + "/Content/Dev/ObvData/Data" },
         GeneratedPath(DATA_INI, listOf("ini", "inipath"), GamePath.GAME, "/Content/Dev/ObvData/"),
         GeneratedPath(UNREAL_INI, listOf("unrealini", "engineini"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Oblivion Remastered/Saved/Config/Windows"),
-        GeneratedPath(PLUGINS, listOf("plugins", "plugin")) { gameConfig[GamePath.GAME] + "/${GameMode.OBLIVION_REMASTERED.deployedModPath}/Plugins.txt" },
+        GeneratedPath(PLUGINS, listOf("plugins", "plugin")) { gameMode.path(DATA) + "/Plugins.txt" },
         GeneratedPath(WIN64, listOf("win64"), GamePath.GAME, win64),
         GeneratedPath(UE4SS_Mods, listOf("ue4ss"), GamePath.GAME, ue4ss),
         GeneratedPath(WINGDK, listOf("wingdk"), GamePath.GAME, "/Binaries/wingdk/ue4ss/Mods"),

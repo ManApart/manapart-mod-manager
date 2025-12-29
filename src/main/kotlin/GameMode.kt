@@ -26,7 +26,7 @@ enum class GameMode(
         "2623190",
         System.getenv("XDG_CONFIG_HOME")?.replace("~", HOME)?.let { "$it/oblivion-remastered-mod-manager-config.json" } ?: "./oblivion-remastered-config.json",
         "./oblivion-remastered-data.json",
-        "/Content/Dev/ObvData/Data",
+        "/Data",
         "oblivion-remastered-mods",
         "oblivionremastered",
         oblivionRemasteredPaths(),
