@@ -32,7 +32,10 @@ fun deploy(command: String, args: List<String>) {
         args.firstOrNull() == "dryrun" -> deployDryRun(files)
         args.firstOrNull() == "overrides" -> showOverrides()
         files.isEmpty() -> println(yellow("No mod files found"))
-        else -> getAllModFilesByTarget(true).entries.forEach { (target, f) -> doDeploy(f, target) }
+        else ->  {
+            deployPlugins(files)
+            getAllModFilesByTarget(true).entries.forEach { (target, f) -> doDeploy(f, target) }
+        }
     }
 }
 
@@ -54,7 +57,6 @@ private fun getAllModFilesByTarget(logMissing: Boolean = false): Map<PathType, M
 private fun doDeploy(files: Map<String, File>, target: PathType) {
     getDisabledModPaths(target).forEach { deleteLink(target, it, files) }
     files.entries.forEach { (gamePath, modFile) -> makeLink(modFile, target, gamePath) }
-    deployPlugins(files)
     println(cyan("Deployed ${files.size} files to $target folder"))
 }
 
@@ -74,7 +76,7 @@ private fun MutableMap<String, File>.addModFiles(mod: Mod, logMissing: Boolean =
 fun makeLink(modFile: File, target: PathType, gamePath: String) {
     val gameFile = getGameFile(target, gamePath)
     if (gameFile == null) {
-        println("Unable to find game file please check your deploytarget for this mod and make sure the path exists. See detail and mod commands.")
+        println("Unable to find game file for $target and path $gamePath. Please check your deploytarget for this mod and make sure the path exists. See detail and mod commands.")
         return
     }
     gameFile.parentFile.mkdirs()
@@ -103,7 +105,7 @@ fun makeLink(modFile: File, target: PathType, gamePath: String) {
 fun deleteLink(target: PathType, gamePath: String, modFiles: Map<String, File>) {
     val gameFile = getGameFile(target, gamePath)
     if (gameFile == null) {
-        println("Unable to find game file please check your deploytarget for this mod and make sure the path exists. See detail and mod commands.")
+        println("Unable to find game file for $target and path $gamePath. Please check your deploytarget for this mod and make sure the path exists. See detail and mod commands.")
         return
     }
     if (!modFiles.contains(gamePath) && Files.isSymbolicLink(gameFile.toPath())) {

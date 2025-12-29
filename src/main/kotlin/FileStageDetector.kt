@@ -33,7 +33,7 @@ fun detectStagingChanges(stageFolder: File, stagedFiles: Array<File> = stageFold
         hasNested && stagedFiles.size == 1 && nestedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.USE_UE4SS
         allFiles.value.any { it.absolutePath.lowercase().contains("obse/plugins") } -> StageChange.USE_OBSE
         allFiles.value.any { it.absolutePath.lowercase().contains("sfse/plugins") } -> StageChange.USE_SFSE
-        hasNested && stagedFiles.size == 1 -> StageChange.REMOVE_TOP_FOLDER
+        hasNested && stagedFiles.size == 1 && firstFolder.name.lowercase() != "data" -> StageChange.REMOVE_TOP_FOLDER
         stagedNames.contains("dwmapi") && stagedNames.contains("ue4ss") -> StageChange.USE_WIN64
         hasNested && firstFolder.name == "ue4ss" && nestedFiles.any { it.name == "Mods" } -> StageChange.CAPITALIZE
         stagedNames.any { validTopLevelFiles.contains(it) } -> StageChange.NONE
