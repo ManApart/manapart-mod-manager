@@ -1,7 +1,7 @@
 import PathType.*
 
 const val win64 = "/Binaries/Win64"
-const val ue4ss = "/Binaries/Win64/ue4ss/Mods"
+const val ue4ss = "/Binaries/Win64/ue4ss/mods"
 const val paks = "/Content/Paks/~mods"
 
 enum class GamePath(val description: String, vararg val examples: String) {
@@ -82,7 +82,7 @@ fun oblivionRemasteredPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(WIN64, listOf("win64"), GamePath.GAME, win64),
         GeneratedPath(UE4SS_Mods, listOf("ue4ss"), GamePath.GAME, ue4ss),
         GeneratedPath(OBSE_PlUGINS, listOf("obse"), GamePath.GAME, "/Binaries/Win64/obse/plugins"),
-        GeneratedPath(WINGDK, listOf("wingdk"), GamePath.GAME, "/Binaries/wingdk/ue4ss/Mods"),
+        GeneratedPath(WINGDK, listOf("wingdk"), GamePath.GAME, "/Binaries/wingdk/ue4ss/mods"),
         GeneratedPath(PAKS, listOf("paks", "unreal-mods"), GamePath.GAME, paks),
         GeneratedPath(SAVES, listOf("saves"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Oblivion Remastered/Saved/SaveGames"),
     ).associateBy { it.type }

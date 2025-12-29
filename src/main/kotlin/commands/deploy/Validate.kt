@@ -78,7 +78,7 @@ fun List<Mod>.validate() {
     modsToFiles.addEmptyEnabled(errorMap)
     modsWithFiles.detectTopLevelNonDataFiles(errorMap, helpMessages)
     modsWithFiles.noSubDirectories(errorMap, helpMessages)
-    detectBadUE4Mods(errorMap,helpMessages)
+    detectBadUE4Mods(errorMap, helpMessages)
     checkPlugins(errorMap, helpMessages)
 
     if (gameMode == GameMode.STARFIELD) {
@@ -153,7 +153,7 @@ private fun List<Mod>.detectStagingIssues(
                 StageChange.NO_FILES -> {
                     errorMap.putIfAbsent(mod.index, mod to mutableListOf())
                     errorMap[mod.index]?.second?.add("No files found in stage folder.")
-                        helpMessages.add("Mod without files should be refreshed or potentially have its deployment target changed.")
+                    helpMessages.add("Mod without files should be refreshed or potentially have its deployment target changed.")
                 }
 
                 else -> {}
@@ -180,21 +180,19 @@ private fun List<Mod>.detectDupePlugins() {
 private fun List<Mod>.detectIncorrectCasing(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
 ) {
-    val goodPaths = (gameMode.generatedPaths.values.map { it.suffix } + gameMode.deployedModPath).filter { it.isNotBlank() }.toSet()
+    val goodPaths = (gameMode.generatedPaths.values.flatMap { listOf(it.suffix, "/"+ it.suffix.split("/").takeLast(2).joinToString("/")) } + gameMode.deployedModPath).filter { it.isNotBlank() && it != "/" }.toSet()
     forEach { mod ->
         val modsPaths = mod.getModFiles()
             .asSequence()
             .map { it.parent }
             .mapNotNull { file ->
-                val start = goodPaths.maxOf { file.indexOf(it) + it.length }
-                val end = file.lastIndexOf("/")
-                if (start < end) file.substring(start, end) else null
+                val lower = file.lowercase()
+                goodPaths.firstOrNull { lower.contains(it) && !file.contains(it) }
             }.toSet()
-            .filter { it.isNotEmpty() && it != it.lowercase() }
             .toList()
         if (modsPaths.isNotEmpty()) {
             errorMap.putIfAbsent(mod.index, mod to mutableListOf())
-            errorMap[mod.index]?.second?.add("Filepaths should be lowercase between data and filename:")
+            errorMap[mod.index]?.second?.add("Filepaths should be lowercase between top folder and filename:")
             modsPaths.forEach {
                 errorMap[mod.index]?.second?.add("\t${it}")
             }
@@ -235,7 +233,7 @@ private fun Map<Mod, List<File>>.noSubDirectories(
     helpMessages: MutableSet<String>
 ) {
     val relevantTargets = listOf(PathType.OBSE_PlUGINS, PathType.PAKS)
-    filter { (mod, files) -> mod.deployTarget in relevantTargets  && files.any { it.isDirectory }}.forEach { (mod, _) ->
+    filter { (mod, files) -> mod.deployTarget in relevantTargets && files.any { it.isDirectory } }.forEach { (mod, _) ->
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Has sub folders that shouldn't exist")
         helpMessages.add("OBSE plugins and paks should be at the root level, without subfolders")
@@ -256,11 +254,11 @@ private fun List<Mod>.detectBadUE4Mods(
     }
 }
 
-private fun checkPlugins(
+private fun List<Mod>.checkPlugins(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
     helpMessages: MutableSet<String>
 ) {
-    toolData.mods.filter { !it.hasTag(Tag.EXTERNAL) }.forEach { mod ->
+    filter { !it.hasTag(Tag.EXTERNAL) }.forEach { mod ->
         val newPlugins = mod.discoverPlugins().sorted().toSet()
         val existing = mod.plugins.sorted().toSet()
 
@@ -274,7 +272,7 @@ private fun checkPlugins(
     }
 }
 
-private fun checkCreations(errors: MutableList<String>, helpMessages: MutableSet<String>, creations:  Map<String, Creation>) {
+private fun checkCreations(errors: MutableList<String>, helpMessages: MutableSet<String>, creations: Map<String, Creation>) {
     creations.values.filter { creation -> (creation.creationId?.let { toolData.byCreationId(it) } == null) }.forEach { creation ->
         errors.add("Creation '${creation.title}' is not managed")
         helpMessages.add("To manage creations try 'help creation'")
@@ -289,10 +287,11 @@ private fun checkExternalMods(errors: MutableList<String>, helpMessages: Mutable
 }
 
 private fun Map<Mod, List<File>>.addEmptyEnabled(
-    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>){
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
+) {
     filter { it.key.enabled && it.value.isEmpty() }.forEach { (mod, _) ->
-            errorMap.putIfAbsent(mod.index, mod to mutableListOf())
-            errorMap[mod.index]?.second?.add("Enabled but not installed")
+        errorMap.putIfAbsent(mod.index, mod to mutableListOf())
+        errorMap[mod.index]?.second?.add("Enabled but not installed")
     }
 }
 

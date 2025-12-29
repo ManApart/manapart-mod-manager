@@ -2,6 +2,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 fun stageMod(sourceFile: File, stageFolder: File, mod: Mod): Boolean {
     stageFolder.mkdirs()
@@ -42,7 +43,7 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
     when (action) {
         StageChange.NONE -> {}
         StageChange.NO_FILES -> println(yellow("No staged files found for ${mod.name}"))
-        StageChange.CAPITALIZE -> capitalizeData(stageFolder)
+        StageChange.CAPITALIZE -> capitalize(stageFolder)
         StageChange.NEST_IN_DATA -> nestInPrefix(mod.name, gameMode.deployedModPath, stageFolder, stagedFiles)
         StageChange.USE_WIN64 -> mod.setDeployTarget(PathType.WIN64)
         StageChange.USE_PAK -> mod.setDeployTarget(PathType.PAKS)
@@ -89,15 +90,16 @@ fun detectStagingChanges(stageFolder: File, stagedFiles: Array<File> = stageFold
     val nestableExtensions = listOf("pak")
     val validTopLevelFiles = listOf("engine")
     val validTopLevelFolders = listOf("data")
-    val firstFile = stagedFiles.firstOrNull()
-    val hasNested = firstFile != null && firstFile.isDirectory
-    val nestedFiles = if (hasNested) firstFile.listFiles() ?: arrayOf() else arrayOf()
+    val firstFolder = stagedFiles.firstOrNull { it.isDirectory }
+    val hasNested = firstFolder != null
+    val nestedFiles = if (hasNested) firstFolder.listFiles() ?: arrayOf() else arrayOf()
     val allFiles = lazy { stageFolder.getFiles() }
     return when {
         stagedFiles.isEmpty() -> StageChange.NO_FILES
         stagedNames.any { validTopLevelFiles.contains(it) } -> StageChange.NONE
         stagedNames.size == 2 && stagedNames.contains("win64") && stagedNames.contains("wingdk") -> StageChange.REMOVE_WINGDK
         stagedFiles.any { validTopLevelFolders.contains(it.nameWithoutExtension) } -> StageChange.CAPITALIZE
+        hasNested && firstFolder.name == "ue4ss" && nestedFiles.any { it.name == "Mods" } -> StageChange.CAPITALIZE
         stagedNames.any { dataTopLevelNames.contains(it) } -> StageChange.NEST_IN_DATA
         stagedNames.any { it.startsWith("obse64") } -> StageChange.USE_WIN64
         stagedNames.any { validTopLevelFolders.contains(it) } -> StageChange.NONE
@@ -174,8 +176,9 @@ private fun nest(stageFolderPath: String, file: File, dataPath: String) {
     }
 }
 
-private fun capitalizeData(stageFolder: File) {
-    Files.move(Path(stageFolder.path + "/data"), Path(stageFolder.path + "/Data"))
+private fun capitalize(stageFolder: File) {
+    Path(stageFolder.path + "/data").takeIf { it.exists() }?.let { Files.move(it, Path(stageFolder.path + "/Data")) }
+    Path(stageFolder.path + "/ue4ss/Mods").takeIf { it.exists() }?.let { Files.move(it, Path(stageFolder.path + "/ue4ss/mods")) }
 }
 
 private fun properlyCasePaths(stageFolder: File) {
