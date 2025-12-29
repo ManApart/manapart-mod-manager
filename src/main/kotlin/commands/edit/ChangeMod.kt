@@ -1,5 +1,6 @@
 package commands.edit
 
+import PathType
 import addModFile
 import save
 import toolData
@@ -10,6 +11,8 @@ val changeDescription = """
     Use id to set its nexus id
     Use file to delete a mods stage folder and restage it from zip
     To see a list of category ids, see the category command
+    Change deploytarget to set where this specific mod is deployed to. Useful for mods like SFSE that deploy outside the data folder
+    To see a list of deploy targets, run config deploytarget
 """.trimIndent()
 val renameHelp = """
     Use name to rename a mod without changing its file paths
@@ -20,9 +23,10 @@ val changeUsage = """
     mod <index> file <file-path> 
     mod <index> name <new name>
     mod <index> category <new category id>
+    mod <index> deploytarget <new deploy target>
 """.trimIndent()
 
-fun moveMod(command: String, args: List<String>){
+fun moveMod(command: String, args: List<String>) {
     changeMod(command, listOf(args.first(), "name") + args.drop(1))
 }
 
@@ -30,10 +34,12 @@ fun changeMod(command: String, args: List<String>) {
     val i = args.firstOrNull()?.toIntOrNull()
     when {
         args.isEmpty() -> println(changeDescription)
-        args.size == 3 && args[1] == "id" -> updateId(i!!, args.last().toInt())
-        args.size == 3 && args[1] == "file" -> updateFile(i!!, args.last())
-        args.size == 3 && args[1] == "name" -> updateName(i!!, args.last())
-        args.size == 3 && args[1] == "category" && args.last().toIntOrNull() != null -> changeCategory(i!!, args.last().toInt())
+        i == null -> println("index must not be null")
+        args.size == 3 && args[1] == "id" -> updateId(i, args.last().toInt())
+        args.size == 3 && args[1] == "file" -> updateFile(i, args.last())
+        args.size == 3 && args[1] == "name" -> updateName(i, args.last())
+        args.size == 3 && args[1] == "deploytarget" -> updateDeployTarget(i, args.last())
+        args.size == 3 && args[1] == "category" && args.last().toIntOrNull() != null -> changeCategory(i, args.last().toInt())
         else -> println(changeDescription)
     }
 }
@@ -46,7 +52,7 @@ private fun updateId(i: Int, id: Int) {
     }
 }
 
-private fun updateName(i: Int, newName:String) {
+private fun updateName(i: Int, newName: String) {
     toolData.byIndex(i)?.let { mod ->
         println("${mod.name} renamed to $newName")
         mod.name = newName
@@ -63,6 +69,17 @@ private fun updateFile(i: Int, sourceFilePath: String) {
             addModFile(mod, sourceFile, mod.name)
         } else {
             println("No file found at $sourceFilePath")
+        }
+    }
+}
+
+private fun updateDeployTarget(i: Int, rawTarget: String) {
+    val target = PathType.fromString(rawTarget)
+    if (target == null) println("$rawTarget does not exist in ${PathType.entries}") else {
+        toolData.byIndex(i)?.let { mod ->
+            println("${mod.name} deploy updated ${mod.deployTarget} -> $target")
+            mod.deployTarget = target
+            save()
         }
     }
 }

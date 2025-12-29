@@ -1,11 +1,11 @@
 package commands.config
 
 import GamePath
+import PathType
 import commands.update.viewAppVersion
 import gameConfig
 import gameMode
 import jsonMapper
-import kotlinx.serialization.encodeToString
 import lastFullInput
 import nexus.getGameInfo
 import red
@@ -96,7 +96,7 @@ fun config(command: String, args: List<String>) {
         }
 
         args.first() == "deploytarget" && args.size == 2 -> {
-            val newTarget = PathType.entries.firstOrNull { it.name.lowercase() == args[1] }
+            val newTarget = PathType.fromString(args[1])
             if (newTarget != null) {
                 gameConfig.defaultDeployTarget = newTarget
                 println("Set default deploy target to ${gameConfig.defaultDeployTarget}")

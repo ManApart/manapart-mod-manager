@@ -1,6 +1,7 @@
 package commands.deploy
 
 import Mod
+import PathType
 import StageChange
 import commands.add.Creation
 import commands.edit.Tag
@@ -132,7 +133,7 @@ private fun List<Mod>.detectStagingIssues(
         if (stageFolder.exists()) {
             when (detectStagingChanges(stageFolder)) {
                 StageChange.UNKNOWN -> {
-                    if (!mod.hasTag(Tag.SKIP_VALIDATE)) {
+                    if (!mod.hasTag(Tag.SKIP_VALIDATE) && mod.deployTarget == PathType.DATA) {
                         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
                         errorMap[mod.index]?.second?.add("Unable to guess folder path.")
                         helpMessages.add("Open the staging folder for unguessed paths and make sure it was installed correctly. Or change the deploy target.")
@@ -215,12 +216,13 @@ private fun Map<Mod, List<File>>.detectTopLevelFiles(
     filter { (mod, files) ->
         val parent = files.first().path.split("/").take(2).joinToString("/") + "/"
         !mod.hasTag(Tag.SKIP_VALIDATE) &&
+                mod.deployTarget == PathType.DATA &&
                 files.none { excludeList.contains(it.name) } &&
                 files.any { file -> goodPaths.none { file.path.replace(parent, "").startsWith(it) } }
     }.forEach { (mod, _) ->
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Has files outside the Data folder")
-        helpMessages.add("To fix files outside of data, change the deployment target, skip validating this mod, or use local to open it and manually fix file structure")
+        helpMessages.add("To fix files outside of data, change the deployment target (see mod command), skip validating this mod, or use local to open it and manually fix file structure")
     }
 }
 

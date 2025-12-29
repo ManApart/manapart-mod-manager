@@ -5,7 +5,11 @@ const val ue4ss = "/Binaries/Win64/ue4ss/Mods"
 const val paks = "/Content/Paks/~mods"
 
 enum class GamePath(val description: String, vararg val examples: String) {
-    GAME("The path to the folder under steam containing the Data folder. Note its nesting in Oblivion Remastered", "/mnt/c/SteamLibrary/steamapps/common/Starfield", "/mnt/c/SteamLibrary/steamapps/common/Oblivion Remastered/OblivionRemastered"),
+    GAME(
+        "The path to the folder under steam containing the Data folder. Note its nesting in Oblivion Remastered",
+        "/mnt/c/SteamLibrary/steamapps/common/Starfield",
+        "/mnt/c/SteamLibrary/steamapps/common/Oblivion Remastered/OblivionRemastered"
+    ),
     COMPAT_DATA("The folder is the steam app id under steam compat data", "/mnt/c/SteamLibrary/steamapps/compatdata/2623190");
 
     fun describe() {
@@ -31,6 +35,11 @@ enum class PathType(val description: String) {
     SAVES("Where your save files are located"),
     STEAM_PICS("Your steam screenshots for the game"),
     SCREENSHOTS("Your game saved screenshots, like photo mode"),
+    ;
+
+    companion object {
+        fun fromString(path: String) = PathType.entries.firstOrNull { path == it.name.lowercase() }
+    }
 }
 
 class GeneratedPath(
