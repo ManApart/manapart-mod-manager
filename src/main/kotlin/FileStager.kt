@@ -50,7 +50,7 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
         StageChange.USE_UE4SS -> mod.setDeployTarget(PathType.UE4SS_Mods)
         StageChange.USE_OBSE -> {
             mod.setDeployTarget(PathType.OBSE_PlUGINS)
-            fullyUnnestLeafFiles(stageFolder)
+            fullyUnnestLeafFiles(stageFolder) { !it.path.lowercase().contains("wingdk") }
         }
 
         StageChange.UNNEST -> unNestFiles(stageFolder, stagedFiles)
@@ -145,8 +145,8 @@ private fun unNest(stageFolderPath: String, nested: File, topPath: String) {
     }
 }
 
-fun fullyUnnestLeafFiles(stageFolder: File) {
-    stageFolder.getFiles().filter { it.isFile }.forEach {
+fun fullyUnnestLeafFiles(stageFolder: File, filterFunction: (File) -> Boolean = { true }) {
+    stageFolder.getFiles(filterFunction).filter { it.isFile }.forEach {
         Files.move(it.toPath(), Path(stageFolder.path + "/" + it.name), StandardCopyOption.REPLACE_EXISTING)
     }
     stageFolder.listFiles()!!.filter { it.isDirectory }.forEach { it.deleteRecursively() }

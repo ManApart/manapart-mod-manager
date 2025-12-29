@@ -8,7 +8,9 @@ import refreshMod
 val refreshDescription = """
     For all mods with ids, attempt to redownload (or grab the file from the downloads folder if it exists) and restage.
     Refreshing can be done by ranges of indexs, or by mod status
+    Refreshing will re-download the existing fileId if it exists
     If you're looking to upgrade to a new version, see update and upgrade
+    Even if a version has not changed, the latest fileId may have (and is updated by update command). To get the latest, use upgrade
 """.trimIndent()
 
 val refreshUsage = """
