@@ -39,7 +39,6 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
         println(yellow("Unable to fix folder path. You should open the staging folder and make sure it was installed correctly."))
         return
     }
-    if (action != StageChange.NONE) println("${mod.name}: $action")
     when (action) {
         StageChange.NONE -> {}
         StageChange.NO_FILES -> println(yellow("No staged files found for ${mod.name}"))
@@ -75,9 +74,7 @@ fun detectStagingChanges(stageFolder: File): StageChange {
     val dataTopLevelExtensions = listOf("esp", "esm", "ba2")
     val nestableExtensions = listOf("pak")
     val validTopLevelFiles = listOf("engine")
-    val validTopLevelFoldersSF = listOf("data")
-    val validTopLevelFoldersOR = listOf("content", "binaries")
-    val validTopLevelFolders = if (gameMode == GameMode.STARFIELD) validTopLevelFoldersSF else validTopLevelFoldersOR
+    val validTopLevelFolders = listOf("data")
     val firstFile = stagedFiles.firstOrNull()
     val hasNested = firstFile != null && firstFile.isDirectory
     val nestedFiles = if (hasNested) firstFile.listFiles() ?: arrayOf() else arrayOf()
@@ -100,6 +97,7 @@ fun detectStagingChanges(stageFolder: File): StageChange {
 
         hasNested && stagedFiles.size == 1 && nestedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.NEST_IN_UE4SS
         stagedNames.contains("fomod") -> StageChange.FOMOD
+        hasNested && stagedFiles.size == 1 -> StageChange.REMOVE_TOP_FOLDER
         else -> StageChange.UNKNOWN
     }
 }
