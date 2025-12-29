@@ -55,6 +55,10 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
             mod.setDeployTarget(PathType.OBSE_PlUGINS)
             fullyUnnestLeafFiles(stageFolder) { !it.path.lowercase().contains("wingdk") }
         }
+        StageChange.USE_SFSE -> {
+            mod.setDeployTarget(PathType.SFSE_PlUGINS)
+            fullyUnnestLeafFiles(stageFolder)
+        }
 
         StageChange.UNNEST -> unNestFiles(stageFolder, stagedFiles)
         StageChange.ADD_TOP_FOLDER -> {
