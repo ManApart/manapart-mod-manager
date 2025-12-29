@@ -34,7 +34,7 @@ fun stageMod(sourceFile: File, stageFolder: File, mod: Mod): Boolean {
 
 private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
     val stagedFiles = stageFolder.listFiles() ?: arrayOf()
-    val action = detectStagingChanges(stageFolder)
+    val action = detectStagingChanges(stageFolder, stagedFiles)
     if (count > 20) {
         println(yellow("Unable to fix folder path. You should open the staging folder and make sure it was installed correctly."))
         return
@@ -63,6 +63,11 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
             fixFolderPath(mod, stageFolder, count + 1)
         }
 
+        StageChange.REMOVE_WINGDK -> {
+            stagedFiles.first { it.nameWithoutExtension.lowercase() == "wingdk" }.deleteRecursively()
+            fixFolderPath(mod, stageFolder, count + 1)
+        }
+
         StageChange.FOMOD -> println(yellow("FOMOD detected for ${mod.name}.") + " You should open the staging folder and pick options yourself.")
         else -> println(yellow("Unable to guess folder path for ${mod.name}.") + " You should open the staging folder and make sure it was installed correctly.")
     }
@@ -74,10 +79,9 @@ private fun Mod.setDeployTarget(target: PathType) {
     save()
 }
 
-enum class StageChange { NONE, NEST_IN_DATA, USE_WIN64, USE_PAK, USE_UE4SS, USE_OBSE, ADD_TOP_FOLDER, REMOVE_TOP_FOLDER, UNNEST, FOMOD, CAPITALIZE, NO_FILES, UNKNOWN }
+enum class StageChange { NONE, NEST_IN_DATA, USE_WIN64, USE_PAK, USE_UE4SS, USE_OBSE, ADD_TOP_FOLDER, REMOVE_TOP_FOLDER, UNNEST, FOMOD, CAPITALIZE, NO_FILES, REMOVE_WINGDK, UNKNOWN }
 
-fun detectStagingChanges(stageFolder: File): StageChange {
-    val stagedFiles = stageFolder.listFiles() ?: arrayOf()
+fun detectStagingChanges(stageFolder: File, stagedFiles: Array<File> = stageFolder.listFiles() ?: arrayOf()): StageChange {
     val stagedNames = stagedFiles.map { it.nameWithoutExtension.lowercase() }
     val stagedExtensions = stagedFiles.map { it.extension }
     val dataTopLevelNames = listOf("textures", "music", "sound", "meshes", "video")
@@ -92,6 +96,7 @@ fun detectStagingChanges(stageFolder: File): StageChange {
     return when {
         stagedFiles.isEmpty() -> StageChange.NO_FILES
         stagedNames.any { validTopLevelFiles.contains(it) } -> StageChange.NONE
+        stagedNames.size == 2 && stagedNames.contains("win64") && stagedNames.contains("wingdk") -> StageChange.REMOVE_WINGDK
         stagedFiles.any { validTopLevelFolders.contains(it.nameWithoutExtension) } -> StageChange.CAPITALIZE
         stagedNames.any { dataTopLevelNames.contains(it) } -> StageChange.NEST_IN_DATA
         stagedNames.any { it.startsWith("obse64") } -> StageChange.USE_WIN64
