@@ -114,6 +114,7 @@ fun detectStagingChanges(stageFolder: File, stagedFiles: Array<File> = stageFold
         stagedNames.contains("fomod") -> StageChange.FOMOD
         allFiles.value.any { it.absolutePath.lowercase().contains("obse/plugins") } -> StageChange.USE_OBSE
         hasNested && stagedFiles.size == 1 -> StageChange.REMOVE_TOP_FOLDER
+        stagedNames.contains("dwmapi") && stagedNames.contains("ue4ss") -> StageChange.USE_WIN64
         else -> StageChange.UNKNOWN
     }
 }
