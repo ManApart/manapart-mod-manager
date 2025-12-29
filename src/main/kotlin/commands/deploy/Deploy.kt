@@ -29,7 +29,6 @@ val deployUsage = """
 fun deploy(command: String, args: List<String>) {
     val files = getAllModFiles(true)
     when {
-        //TODO - not seeing plugins
         args.firstOrNull() == "dryrun" -> deployDryRun(files)
         args.firstOrNull() == "overrides" -> showOverrides()
         files.isEmpty() -> println(yellow("No mod files found"))
@@ -56,7 +55,7 @@ private fun doDeploy(files: Map<String, File>, target: PathType) {
     getDisabledModPaths(target).forEach { deleteLink(target, it, files) }
     files.entries.forEach { (gamePath, modFile) -> makeLink(modFile, target, gamePath) }
     deployPlugins(files)
-    println(cyan("Deployed ${files.size} files"))
+    println(cyan("Deployed ${files.size} files to $target folder"))
 }
 
 private fun getDisabledModPaths(target: PathType): List<String> {
