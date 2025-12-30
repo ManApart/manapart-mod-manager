@@ -26,6 +26,7 @@ dependencies {
     implementation("org.slf4j:slf4j-nop:2.0.9")
 
     testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.14.7")
 }
 
 tasks.test {
