@@ -2,20 +2,20 @@ import io.mockk.every
 import io.mockk.mockk
 import java.io.File
 
-fun mockFile(name: String): File {
+fun mockFolder(name: String, children: List<File> = emptyList(), parentPath: String? = null): File {
     val file = mockk<File>()
     every { file.name } returns name
-    every { file.nameWithoutExtension } returns name.split(".").dropLast(1).joinToString(".")
-    every { file.isDirectory } returns false
-    every { file.listFiles() } returns emptyArray<File>()
+    every { file.absolutePath } returns (parentPath?.let { "$it/" } ?: "") + name
+    every { file.isDirectory } returns true
+    every { file.listFiles() } returns children.toTypedArray()
     return file
 }
 
-fun mockFolder(name: String, children: List<File> = emptyList()): File {
+fun mockFile(name: String, parentPath: String? = null): File {
     val file = mockk<File>()
     every { file.name } returns name
-    every { file.nameWithoutExtension } returns name
-    every { file.isDirectory } returns true
-    every { file.listFiles() } returns children.toTypedArray()
+    every { file.absolutePath } returns (parentPath?.let { "$it/" } ?: "") + name
+    every { file.isDirectory } returns false
+    every { file.listFiles() } returns emptyArray<File>()
     return file
 }

@@ -60,5 +60,15 @@ class FileStageDetectorTest {
         assertEquals(StageChange.NEST_IN_DATA, actuals.first())
     }
 
-
+    @Test
+    fun nestInDataExtensions() {
+        val actuals = listOf("esp", "esm", "ba2").map { dataTopLevel ->
+            val root = folder("test-mod") {
+                file("thing.$dataTopLevel")
+            }
+            detectStagingChanges(root)
+        }.toSet()
+        assertEquals(1, actuals.size)
+        assertEquals(StageChange.NEST_IN_DATA, actuals.first())
+    }
 }
