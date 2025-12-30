@@ -1,5 +1,4 @@
 import PathType.*
-import gamePath
 
 const val win64 = "/Binaries/Win64"
 const val ue4ss = "/Binaries/Win64/ue4ss/mods"
@@ -32,8 +31,7 @@ enum class PathType(val description: String) {
     WIN64("Where the unreal engine binary lives"),
     WINGDK("Folder that UE4SS mods are deployed to for game pass (not used)"),
     UE4SS_Mods("Folder that UE4SS mods are deployed to"),
-    OBSE_PlUGINS("Folder that obse plugins are deployed to"),
-    SFSE_PlUGINS("Folder that sfse plugins are deployed to"),
+    SCRIPT_EXTENDER_PLUGINS("Folder that obse/sfse plugins are deployed to"),
     PAKS("Where the unreal engine mods live"),
     SAVES("Where your save files are located"),
     STEAM_PICS("Your steam screenshots for the game"),
@@ -67,7 +65,7 @@ fun starfieldPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(CATALOG, listOf("catalog"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/AppData/Local/Starfield/ContentCatalog.txt"),
         GeneratedPath(INI, listOf("ini", "inipath"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Starfield"),
         GeneratedPath(PLUGINS, listOf("plugins", "plugin"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/AppData/Local/Starfield/Plugins.txt"),
-        GeneratedPath(SFSE_PlUGINS, listOf("sfse")) { gameMode.path(DATA)!! + "/sfse/plugins" },
+        GeneratedPath(SCRIPT_EXTENDER_PLUGINS, listOf("sfse")) { gameMode.path(DATA)!! + "/sfse/plugins" },
         GeneratedPath(SAVES, listOf("saves"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Starfield/Saves"),
         GeneratedPath(STEAM_PICS, listOf("steampics")) { "$HOME/.steam/debian-installation/userdata/72953529/760/remote/1716740/screenshots" },
         GeneratedPath(SCREENSHOTS, listOf("screenshots", "photos")) { gameConfig[GamePath.GAME] + GameMode.STARFIELD.deployedModPath + "/textures/Photos" },
@@ -84,7 +82,7 @@ fun oblivionRemasteredPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(PLUGINS, listOf("plugins", "plugin")) { gameMode.path(DATA) + "/Plugins.txt" },
         GeneratedPath(WIN64, listOf("win64"), GamePath.GAME, win64),
         GeneratedPath(UE4SS_Mods, listOf("ue4ss"), GamePath.GAME, ue4ss),
-        GeneratedPath(OBSE_PlUGINS, listOf("obse"), GamePath.GAME, "/Binaries/Win64/obse/plugins"),
+        GeneratedPath(SCRIPT_EXTENDER_PLUGINS, listOf("obse"), GamePath.GAME, "/Binaries/Win64/obse/plugins"),
         GeneratedPath(WINGDK, listOf("wingdk"), GamePath.GAME, "/Binaries/wingdk/ue4ss/mods"),
         GeneratedPath(PAKS, listOf("paks", "unreal-mods"), GamePath.GAME, paks),
         GeneratedPath(SAVES, listOf("saves"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Oblivion Remastered/Saved/SaveGames"),

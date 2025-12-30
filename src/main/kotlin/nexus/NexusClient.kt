@@ -11,6 +11,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.readByteArray
 import kotlinx.serialization.json.Json
 import verbose
 import java.io.File
@@ -126,8 +127,8 @@ fun downloadMod(initialUrl: String, destination: String, forceRedownload: Boolea
                 var iterations = 0
                 while (!channel.isClosedForRead) {
                     val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-                    while (!packet.isEmpty) {
-                        val bytes = packet.readBytes()
+                    while (!packet.exhausted()) {
+                        val bytes = packet.readByteArray()
                         result.appendBytes(bytes)
                         iterations++
                         if (iterations > 1000) {

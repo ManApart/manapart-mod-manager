@@ -49,15 +49,13 @@ private fun fixFolderPath(mod: Mod, stageFolder: File, count: Int = 0) {
             mod.setDeployTarget(PathType.WIN64)
             capitalize(stageFolder)
         }
+
         StageChange.USE_PAK -> mod.setDeployTarget(PathType.PAKS)
         StageChange.USE_UE4SS -> mod.setDeployTarget(PathType.UE4SS_Mods)
-        StageChange.USE_OBSE -> {
-            mod.setDeployTarget(PathType.OBSE_PlUGINS)
-            fullyUnnestLeafFiles(stageFolder) { !it.path.lowercase().contains("wingdk") }
-        }
-        StageChange.USE_SFSE -> {
-            mod.setDeployTarget(PathType.SFSE_PlUGINS)
-            fullyUnnestLeafFiles(stageFolder)
+        StageChange.USE_SCRIPT_EXTENDER -> {
+            mod.setDeployTarget(PathType.SCRIPT_EXTENDER_PLUGINS)
+            val filter: (File) -> Boolean = if (gameMode == GameMode.OBLIVION_REMASTERED) { it -> !it.path.lowercase().contains("wingdk") } else { _ -> true }
+            fullyUnnestLeafFiles(stageFolder, filter)
         }
 
         StageChange.UNNEST -> unNestFiles(stageFolder, stagedFiles)

@@ -1,6 +1,6 @@
 import java.io.File
 
-enum class StageChange { NONE, NEST_IN_DATA, USE_WIN64, USE_PAK, USE_UE4SS, USE_OBSE, USE_SFSE, ADD_TOP_FOLDER, REMOVE_TOP_FOLDER, UNNEST, FOMOD, CAPITALIZE, NO_FILES, REMOVE_WINGDK, UNKNOWN }
+enum class StageChange { NONE, NEST_IN_DATA, USE_WIN64, USE_PAK, USE_UE4SS, USE_SCRIPT_EXTENDER, ADD_TOP_FOLDER, REMOVE_TOP_FOLDER, UNNEST, FOMOD, CAPITALIZE, NO_FILES, REMOVE_WINGDK, UNKNOWN }
 
 fun detectStagingChanges(stageFolder: File, stagedFiles: Array<File> = stageFolder.listFiles() ?: arrayOf()): StageChange {
     val stagedNames = stagedFiles.map { it.nameWithoutExtension.lowercase() }
@@ -31,8 +31,8 @@ fun detectStagingChanges(stageFolder: File, stagedFiles: Array<File> = stageFold
             .any { validTopLevelFolders.contains(it) || validTopLevelFiles.contains(it) } -> StageChange.REMOVE_TOP_FOLDER
 
         hasNested && stagedFiles.size == 1 && nestedFiles.any { it.name.lowercase() == "enabled.txt" } -> StageChange.USE_UE4SS
-        allFiles.value.any { it.absolutePath.lowercase().contains("obse/plugins") } -> StageChange.USE_OBSE
-        allFiles.value.any { it.absolutePath.lowercase().contains("sfse/plugins") } -> StageChange.USE_SFSE
+        allFiles.value.any { it.absolutePath.lowercase().contains("obse/plugins") } -> StageChange.USE_SCRIPT_EXTENDER
+        allFiles.value.any { it.absolutePath.lowercase().contains("sfse/plugins") } -> StageChange.USE_SCRIPT_EXTENDER
         hasNested && stagedFiles.size == 1 && firstFolder.name.lowercase() != "data" -> StageChange.REMOVE_TOP_FOLDER
         stagedNames.contains("dwmapi") && stagedNames.contains("ue4ss") -> StageChange.USE_WIN64
         hasNested && firstFolder.name == "ue4ss" && nestedFiles.any { it.name == "Mods" } -> StageChange.CAPITALIZE

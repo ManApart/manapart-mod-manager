@@ -232,7 +232,7 @@ private fun Map<Mod, List<File>>.noSubDirectories(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
     helpMessages: MutableSet<String>
 ) {
-    val relevantTargets = listOf(PathType.OBSE_PlUGINS, PathType.PAKS)
+    val relevantTargets = listOf(PathType.SCRIPT_EXTENDER_PLUGINS, PathType.PAKS)
     filter { (mod, files) -> mod.deployTarget in relevantTargets && files.any { it.isDirectory } }.forEach { (mod, _) ->
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Has sub folders that shouldn't exist")
