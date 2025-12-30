@@ -95,16 +95,16 @@ fun config(command: String, args: List<String>) {
             }
         }
 
-        args.first() == "deploytarget" && args.size == 2 -> {
+        (args.first() == "deploytarget" || args.first() == "dt") && args.size == 2 -> {
             val newTarget = PathType.fromString(args[1])
             if (newTarget != null) {
                 gameConfig.defaultDeployTarget = newTarget
                 println("Set default deploy target to ${gameConfig.defaultDeployTarget}")
                 save()
-            } else println("${args[1]} does not exist in ${PathType.entries}")
+            } else println("${args[1]} does not exist in ${PathType.listWithAliases()}")
         }
 
-        args.first() == "deploytarget" -> println("Deploy target options are: ${PathType.entries}")
+        args.first() == "deploytarget" || args.first() == "dt" -> println("Deploy target options are: ${PathType.listWithAliases()}")
         args.first() == "verbose" -> updateFlag(args, toolConfig::verbose)
         args.first() == "autodeploy" -> updateFlag(args, toolConfig::autoDeploy)
         args.first() == "version" -> viewAppVersion()

@@ -30,7 +30,7 @@ enum class PathType(val description: String) {
     CATALOG("The catalog file that tracks creations"),
     WIN64("Where the unreal engine binary lives"),
     WINGDK("Folder that UE4SS mods are deployed to for game pass (not used)"),
-    UE4SS_Mods("Folder that UE4SS mods are deployed to"),
+    UE4SS_MODS("Folder that UE4SS mods are deployed to"),
     SCRIPT_EXTENDER_PLUGINS("Folder that obse/sfse plugins are deployed to"),
     PAKS("Where the unreal engine mods live"),
     SAVES("Where your save files are located"),
@@ -39,7 +39,8 @@ enum class PathType(val description: String) {
     ;
 
     companion object {
-        fun fromString(path: String) = PathType.entries.firstOrNull { path == it.name.lowercase() }
+        fun fromString(path: String) = PathType.entries.firstOrNull { path == it.name.lowercase() } ?: gameMode.generatedPaths.values.firstOrNull { it.aliases.contains(path) }?.type
+        fun listWithAliases() = entries.joinToString(", ") { type -> type.name + (gameMode.generatedPaths[type]?.aliases?.joinToString(", ")?.let { " ($it)" } ?: "") }
     }
 }
 
@@ -81,7 +82,7 @@ fun oblivionRemasteredPaths(): Map<PathType, GeneratedPath> {
         GeneratedPath(UNREAL_INI, listOf("unrealini", "engineini"), GamePath.COMPAT_DATA, "/pfx/drive_c/users/steamuser/Documents/My Games/Oblivion Remastered/Saved/Config/Windows"),
         GeneratedPath(PLUGINS, listOf("plugins", "plugin")) { gameMode.path(DATA) + "/Plugins.txt" },
         GeneratedPath(WIN64, listOf("win64"), GamePath.GAME, win64),
-        GeneratedPath(UE4SS_Mods, listOf("ue4ss"), GamePath.GAME, ue4ss),
+        GeneratedPath(UE4SS_MODS, listOf("ue4ss"), GamePath.GAME, ue4ss),
         GeneratedPath(SCRIPT_EXTENDER_PLUGINS, listOf("obse"), GamePath.GAME, "/Binaries/Win64/obse/plugins"),
         GeneratedPath(WINGDK, listOf("wingdk"), GamePath.GAME, "/Binaries/wingdk/ue4ss/mods"),
         GeneratedPath(PAKS, listOf("paks", "unreal-mods"), GamePath.GAME, paks),

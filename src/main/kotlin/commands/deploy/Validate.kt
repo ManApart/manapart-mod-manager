@@ -244,7 +244,7 @@ private fun List<Mod>.detectBadUE4Mods(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
     helpMessages: MutableSet<String>
 ) {
-    filter { it.deployTarget == PathType.UE4SS_Mods }.filter { mod ->
+    filter { it.deployTarget == PathType.UE4SS_MODS }.filter { mod ->
         val files = File(mod.filePath).listFiles()
         files.size != 1 || files.first().listFiles().none { it.name.lowercase() == "enabled.txt" }
     }.forEach { mod ->

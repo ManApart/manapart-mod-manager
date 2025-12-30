@@ -76,7 +76,7 @@ private fun updateFile(i: Int, sourceFilePath: String) {
 
 private fun updateDeployTarget(i: Int, rawTarget: String) {
     val target = PathType.fromString(rawTarget)
-    if (target == null) println("$rawTarget does not exist in ${PathType.entries}") else {
+    if (target == null) println("$rawTarget does not exist in ${PathType.listWithAliases()}") else {
         toolData.byIndex(i)?.let { mod ->
             println("${mod.name} deploy updated ${mod.deployTarget} -> $target")
             mod.deployTarget = target

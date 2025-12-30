@@ -20,6 +20,14 @@ val jsonMapper = kotlinx.serialization.json.Json {
     prettyPrint = true
 }
 
+val jsonMapperVerbose by lazy {
+    kotlinx.serialization.json.Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+        encodeDefaults = true
+    }
+}
+
 fun main(args: Array<String>) {
     checkForUpgrade()
     loadData()
