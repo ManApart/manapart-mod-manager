@@ -29,4 +29,36 @@ class FileStageDetectorTest {
         val actual = detectStagingChanges(root)
         assertEquals(StageChange.REMOVE_WINGDK, actual)
     }
+
+    @Test
+    fun detectFOMOD() {
+        val root = folder("test-mod") {
+            folder("FOMOD")
+        }
+        val actual = detectStagingChanges(root)
+        assertEquals(StageChange.FOMOD, actual)
+    }
+
+    @Test
+    fun capitalize() {
+        val root = folder("test-mod") {
+            folder("data")
+        }
+        val actual = detectStagingChanges(root)
+        assertEquals(StageChange.CAPITALIZE, actual)
+    }
+
+    @Test
+    fun nestInData() {
+        val actuals = listOf("textures", "music", "sound", "meshes", "video").map { dataTopLevel ->
+            val root = folder("test-mod") {
+                folder(dataTopLevel)
+            }
+            detectStagingChanges(root)
+        }.toSet()
+        assertEquals(1, actuals.size)
+        assertEquals(StageChange.NEST_IN_DATA, actuals.first())
+    }
+
+
 }
