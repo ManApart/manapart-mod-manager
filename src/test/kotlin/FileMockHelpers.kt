@@ -5,6 +5,7 @@ import java.io.File
 fun mockFile(name: String): File {
     val file = mockk<File>()
     every { file.name } returns name
+    every { file.nameWithoutExtension } returns name.split(".").dropLast(1).joinToString(".")
     every { file.isDirectory } returns false
     every { file.listFiles() } returns emptyArray<File>()
     return file
@@ -13,6 +14,7 @@ fun mockFile(name: String): File {
 fun mockFolder(name: String, children: List<File> = emptyList()): File {
     val file = mockk<File>()
     every { file.name } returns name
+    every { file.nameWithoutExtension } returns name
     every { file.isDirectory } returns true
     every { file.listFiles() } returns children.toTypedArray()
     return file
