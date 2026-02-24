@@ -1,5 +1,3 @@
-import java.io.ByteArrayOutputStream
-
 plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.20"
@@ -41,17 +39,22 @@ application {
     mainClass.set("MainKt")
 }
 
-fun writeCommit(){
-    val byteOut = ByteArrayOutputStream()
-    project.exec {
-        commandLine = "git rev-parse HEAD".split(" ")
-        standardOutput = byteOut
-    }
-    File("./src/main/resources/commit.txt").also { it.parentFile.mkdirs() }.writeText(String(byteOut.toByteArray()))
+fun writeCommit() {
+    val commit = runCatching {
+        val process = ProcessBuilder("git", "rev-parse", "HEAD").directory(rootDir).redirectErrorStream(true).start()
+        val output = process.inputStream.bufferedReader().use { it.readText().trim() }
+        if (process.waitFor() == 0) output else "unknown"
+    }.getOrDefault("unknown")
+
+    File("./src/main/resources/commit.txt")
+        .also { it.parentFile.mkdirs() }
+        .writeText("$commit\n")
 }
 
-tasks.withType<Jar> {
-    writeCommit()
+tasks.withType<Jar>().configureEach {
+    doFirst {
+        writeCommit()
+    }
     manifest {
         attributes["Main-Class"] = "MainKt"
     }
