@@ -31,4 +31,4 @@ jobs:
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: ./build/libs/starfield-mod-manager.jar,./app/smm.desktop
+          artifacts: ./build/libs/manapart-mod-manager.jar,./app/smm.desktop
