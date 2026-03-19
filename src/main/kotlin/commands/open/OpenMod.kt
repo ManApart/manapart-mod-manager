@@ -70,7 +70,7 @@ fun open(command: String, args: List<String>) {
     } else if (gamePath != null) {
         open(gamePath.path(), gamePath.type.name, cli)
     } else {
-        openMod(openInWeb, command, args)
+        openMod(openInWeb, cli, command, args)
     }
 }
 
@@ -87,14 +87,14 @@ private fun openNexus(args: List<String>) {
     openInWeb("https://www.nexusmods.com/starfield/mods/${modId}")
 }
 
-private fun openMod(web: Boolean = true, command: String, args: List<String>) {
+private fun openMod(web: Boolean = true, cliCommand: Boolean, command: String, args: List<String>) {
     if (args.isEmpty() || (args.size == 1 && args.first() == "cli")) {
         val commandType = CommandType.entries.firstOrNull {it.name.lowercase() == command} ?: CommandType.OPEN
         println(commandType.description + "\n")
         println(commandType.usage)
         return
     }
-    val cli = args.contains("cli")
+    val cli = cliCommand || args.contains("cli")
     val mods = args.filter { it != "cli" }.getIndicesOrRange(toolData.mods.size).mapNotNull { toolData.mods.getOrNull(it) }
     when {
         mods.isEmpty() -> println(openDescription)
