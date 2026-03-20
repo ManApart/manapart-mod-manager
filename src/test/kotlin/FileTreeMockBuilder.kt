@@ -4,12 +4,12 @@ class FileTreeMockBuilder(val name: String) {
     private val childFolders = mutableListOf<FileTreeMockBuilder>()
     private val childFiles = mutableListOf<String>()
 
-    fun folder(builder: FileTreeMockBuilder) {
-        childFolders.add(builder)
-    }
-
     fun folder(name: String) {
         childFolders.add(FileTreeMockBuilder(name))
+    }
+
+    fun folder(name: String, initializer: FileTreeMockBuilder.() -> Unit) {
+        childFolders.add(FileTreeMockBuilder(name).apply(initializer))
     }
 
     fun file(name: String) {
@@ -24,6 +24,6 @@ class FileTreeMockBuilder(val name: String) {
     }
 }
 
-fun folder(name: String, initializer: FileTreeMockBuilder.() -> Unit): File {
+fun rootFolder(name: String, initializer: FileTreeMockBuilder.() -> Unit): File {
     return FileTreeMockBuilder(name).apply(initializer).build()
 }
