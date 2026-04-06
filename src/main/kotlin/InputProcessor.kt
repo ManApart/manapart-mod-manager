@@ -3,14 +3,14 @@ import commands.getCommand
 
 var lastFullInput = ""
 
-fun readLine(line: String?) = line?.split("&")?.forEach { readCommand(it) }
+fun readLine(line: String?) = line?.split(" & ")?.forEach { readCommand(it) }
 
 fun readCommand(line: String) {
     val parts = line.parseArgs().map { it.lowercase() }
     lastFullInput = line
     when {
         parts.isEmpty() -> CommandType.HELP.usage
-        parts.size == 1 && parts.first().startsWith("nxm://") -> addModByNexusProtocol(parts.first())
+        parts.size == 1 && parts.first().startsWith("nxm://") -> addModByNexusProtocol(line)
         else -> {
             val commandString = parts.first().lowercase()
             val args = parts.subList(1, parts.size)

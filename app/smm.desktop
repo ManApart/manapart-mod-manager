@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Manapart Mod Manager
 Comment=Manage Starfield Mods
-Exec=sh -c "java -jar manapart-mod-manager.jar %U"
+Exec=java -jar manapart-mod-manager.jar %u
 Path=/tmp
 Icon=steam_icon_1716740
 Terminal=true
