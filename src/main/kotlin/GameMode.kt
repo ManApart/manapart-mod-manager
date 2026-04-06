@@ -13,7 +13,7 @@ enum class GameMode(
         "Starfield",
         "sf",
         "1716740",
-        System.getenv("XDG_CONFIG_HOME")?.replace("~", HOME)?.let { "$it/starfield-mod-manager-config.json" } ?: "./starfield-config.json",
+        getConfigPath("starfield-mod-manager-config.json", "starfield-config.json"),
         "./starfield-data.json",
         "/Data",
         "starfield-mods",
@@ -24,7 +24,7 @@ enum class GameMode(
         "Oblivion Remastered",
         "or",
         "2623190",
-        System.getenv("XDG_CONFIG_HOME")?.replace("~", HOME)?.let { "$it/oblivion-remastered-mod-manager-config.json" } ?: "./oblivion-remastered-config.json",
+        getConfigPath("oblivion-remastered-mod-manager-config.json", "oblivion-remastered-config.json"),
         "./oblivion-remastered-data.json",
         "/Data",
         "oblivion-remastered-mods",
@@ -35,4 +35,8 @@ enum class GameMode(
     fun path(type: PathType) = generatedPaths[type]?.path()
 }
 
-fun mainConfigPath() = System.getenv("XDG_CONFIG_HOME")?.replace("~", HOME)?.let { "$it/mod-manager-config.json" } ?: "./config.json"
+fun mainConfigPath() = getConfigPath("mod-manager-config.json", "config.json")
+
+private fun getConfigPath(nameInHome: String, nameLocal: String): String {
+    return System.getenv("XDG_CONFIG_HOME")?.replace($$"$HOME", HOME)?.let { "$it/$nameInHome" } ?: "./$nameLocal"
+}

@@ -11,7 +11,7 @@ lateinit var toolConfig: MainConfig
 lateinit var gameConfig: GameConfig
 lateinit var modFolder: File
 var gameMode = GameMode.STARFIELD
-val HOME = System.getProperty("user.home")!!
+val HOME = System.getProperty("user.home") ?: "."
 private var confirmation: ((List<String>) -> Unit)? = null
 var testingMode = false
 
