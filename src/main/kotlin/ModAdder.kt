@@ -111,8 +111,6 @@ fun ModFileInfo.getPrimaryFile(): Int? {
 
 fun addModByNexusProtocol(url: String) {
     val request = parseDownloadRequest(url)
-    println(request)
-    println("Key: ${toolConfig.apiKey}")
     val modInfo = runBlocking { getModDetails(toolConfig.apiKey!!, request.modId) }
     if (modInfo == null) {
         println(red("Unable to download $url"))

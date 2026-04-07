@@ -1,5 +1,3 @@
-import java.io.File
-
 enum class GameMode(
     val displayName: String,
     val abbreviation: String,
@@ -18,7 +16,7 @@ enum class GameMode(
         getConfigPath("starfield-config.json"),
         getConfigPath("./starfield-data.json"),
         "/Data",
-        getConfigPath("starfield-mods"),
+        "starfield-mods",
         "starfield",
         starfieldPaths(),
     ),
@@ -29,7 +27,7 @@ enum class GameMode(
         getConfigPath("oblivion-remastered-config.json"),
         getConfigPath("./oblivion-remastered-data.json"),
         "/Data",
-        getConfigPath("oblivion-remastered-mods"),
+        "oblivion-remastered-mods",
         "oblivionremastered",
         oblivionRemasteredPaths(),
     );
