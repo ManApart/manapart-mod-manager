@@ -10,8 +10,8 @@ lateinit var toolData: Data
 lateinit var toolConfig: MainConfig
 lateinit var gameConfig: GameConfig
 lateinit var modFolder: File
+val HOME = System.getenv("MMM_HOME") ?: System.getProperty("user.home") ?: "."
 var gameMode = GameMode.STARFIELD
-val HOME = System.getProperty("user.home") ?: "."
 private var confirmation: ((List<String>) -> Unit)? = null
 var testingMode = false
 
@@ -88,6 +88,7 @@ private fun upgradeConfig(legacyConfig: JsonObject) {
 }
 
 fun loadData() {
+    File(mainConfigPath()).parentFile.mkdirs()
     toolConfig = File(mainConfigPath()).takeIf { it.exists() }?.let {
         jsonMapper.decodeFromString(it.readText())
     } ?: MainConfig()

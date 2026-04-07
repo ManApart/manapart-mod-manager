@@ -1,3 +1,5 @@
+import java.io.File
+
 enum class GameMode(
     val displayName: String,
     val abbreviation: String,
@@ -13,10 +15,10 @@ enum class GameMode(
         "Starfield",
         "sf",
         "1716740",
-        getConfigPath("starfield-mod-manager-config.json", "starfield-config.json"),
-        "./starfield-data.json",
+        getConfigPath("starfield-config.json"),
+        getConfigPath("./starfield-data.json"),
         "/Data",
-        "starfield-mods",
+        getConfigPath("starfield-mods"),
         "starfield",
         starfieldPaths(),
     ),
@@ -24,10 +26,10 @@ enum class GameMode(
         "Oblivion Remastered",
         "or",
         "2623190",
-        getConfigPath("oblivion-remastered-mod-manager-config.json", "oblivion-remastered-config.json"),
-        "./oblivion-remastered-data.json",
+        getConfigPath("oblivion-remastered-config.json"),
+        getConfigPath("./oblivion-remastered-data.json"),
         "/Data",
-        "oblivion-remastered-mods",
+        getConfigPath("oblivion-remastered-mods"),
         "oblivionremastered",
         oblivionRemasteredPaths(),
     );
@@ -35,8 +37,8 @@ enum class GameMode(
     fun path(type: PathType) = generatedPaths[type]?.path()
 }
 
-fun mainConfigPath() = getConfigPath("mod-manager-config.json", "config.json")
+fun mainConfigPath() = getConfigPath("config.json")
 
-private fun getConfigPath(nameInHome: String, nameLocal: String): String {
-    return System.getenv("XDG_CONFIG_HOME")?.replace($$"$HOME", HOME)?.let { "$it/$nameInHome" } ?: "./$nameLocal"
+private fun getConfigPath(name: String): String {
+    return System.getenv("XDG_CONFIG_HOME")?.replace($$"$HOME", HOME)?.let { "$it/mmm/$name" } ?: "$HOME/mmm/$name"
 }
