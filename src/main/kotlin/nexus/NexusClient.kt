@@ -26,6 +26,9 @@ private val client = HttpClient {
 }
 
 fun parseDownloadRequest(url: String): DownloadRequest {
+    if (!url.contains("&expires=")){
+        throw IllegalArgumentException("Url was unable to be parsed: $url")
+    }
     val modId = url.between("mods/", "/").toInt()
     val fileId = url.between("files/", "?key").toInt()
     val key = url.between("?key=", "&")
