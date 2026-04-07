@@ -1,6 +1,7 @@
 package commands.config
 
 import GamePath
+import HOME
 import PathType
 import commands.update.viewAppVersion
 import gameConfig
@@ -47,6 +48,7 @@ fun config(command: String, args: List<String>) {
     when {
         args.isEmpty() -> {
             println("Running ${gameMode.name} in ${File(".").absolutePath}")
+            println("Using HOME '$HOME' with game config path '${gameMode.configPath}'")
             println("Main Config:\n" + jsonMapper.encodeToString(toolConfig))
             println("Game Config:\n" + jsonMapper.encodeToString(gameConfig))
         }
