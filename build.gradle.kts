@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.2.20"
-    kotlin("plugin.serialization") version "2.2.20"
+    kotlin("jvm") version "2.3.20"
+    kotlin("plugin.serialization") version "2.3.20"
     application
 }
 
@@ -24,15 +24,11 @@ dependencies {
     implementation("org.slf4j:slf4j-nop:2.0.9")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.14.7")
+    testImplementation("io.mockk:mockk:1.14.9")
 }
 
 tasks.test {
     useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(17)
 }
 
 application {
