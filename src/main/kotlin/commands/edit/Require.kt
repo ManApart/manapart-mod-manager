@@ -1,4 +1,8 @@
 package commands.edit
+
+import Mod
+import toolData
+
 val requireDescription = """
     Mark a mod as requiring another mod
     When a mod is enabled, any required mods are also enabled
@@ -9,13 +13,55 @@ val requireDescription = """
 """.trimIndent()
 
 val requireUsage = """
-    require 123 
-    require 123 all
-    require 123 child
-    require 123 add 456
-    require 123 remove 456
+    require <index>
+    require <index> all
+    require <index> child
+    require <index> add 456
+    require <index> remove 456
 """.trimIndent()
 
 fun require(command: String, args: List<String>) {
+    val mod = args.firstOrNull()?.toIntOrNull()?.let { toolData.byIndex(it) }
+    val other = args.lastOrNull()?.toIntOrNull()?.let { toolData.byIndex(it) }
+    val subCommand = args.firstOrNull { it.toIntOrNull() == null }
+    when {
+        args.isEmpty() || mod == null -> println("Specify the index of a mod to see requirements")
+        subCommand == "all" -> printAllRequirements(mod)
+        subCommand == "child" -> printChildren(mod)
+        subCommand == null -> printRequirements(mod)
+        other == null -> println("You need to specify the mod to add/remove")
+        subCommand == "add" -> {
+            mod.require(other)
+            println("${mod.name} now requires ${other.idName()}")
+        }
 
+        subCommand == "remove" -> {
+            mod.removeRequired(other)
+            println("${mod.name} no longer requires ${other.idName()}")
+        }
+    }
+}
+
+private fun printRequirements(mod: Mod) {
+    val mods = mod.getRequiredMods()
+    if (mods.isEmpty()) println("${mod.name} doesn't require any mods") else {
+        println(mod.name + " requires")
+        println("\t" + mods.joinToString("\n\t") { it.idName() })
+    }
+}
+
+private fun printAllRequirements(mod: Mod) {
+    val mods = mod.getAllRequiredMods()
+    if (mods.isEmpty()) println("${mod.name} doesn't require any mods") else {
+        println(mod.name + " requires (all)")
+        println("\t" + mods.joinToString("\n\t") { it.idName() })
+    }
+}
+
+private fun printChildren(mod: Mod) {
+    val mods = mod.getDependantMods()
+    if (mods.isEmpty()) println("${mod.name} isn't needed by any mods") else {
+        println(mod.name + " is depended on by")
+        println("\t" + mods.joinToString("\n\t") { it.idName() })
+    }
 }
