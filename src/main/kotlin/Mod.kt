@@ -21,6 +21,8 @@ data class Mod(
     var enabled: Boolean = false,
     var categoryId: Int? = null,
     var endorsed: Boolean? = null,
+    val requiredIds: MutableSet<Int> = mutableSetOf(),
+    val requiredNames: MutableSet<String> = mutableSetOf(),
     val tags: MutableSet<String> = mutableSetOf(),
 ) {
     @Transient
@@ -49,10 +51,6 @@ data class Mod(
         return if (id == null) name else "$id $name"
     }
 
-    fun idOrName(): String {
-        return id?.toString() ?: name
-    }
-
     fun description(): String {
         return "$index (${id ?: "?"}) $name"
     }
@@ -61,16 +59,39 @@ data class Mod(
         return categoryId?.let { gameConfig.categories[it] }
     }
 
-    fun add(tag: Tag){
+    fun add(tag: Tag) {
         tags.add(tag.tag)
         save()
     }
-    fun remove(tag: Tag){
+
+    fun remove(tag: Tag) {
         tags.remove(tag.tag)
         save()
     }
+
     fun hasTag(tag: Tag) = hasTag(tag.tag)
     fun hasTag(tag: String) = tags.contains(tag)
+
+
+    fun require(mod: Mod) {
+        val modId = mod.id
+        if (modId != null) requiredIds.add(modId) else requiredNames.add(mod.name)
+        save()
+    }
+
+    fun removeRequired(mod: Mod) {
+        requiredIds.remove(mod.id)
+        requiredNames.remove(mod.name)
+        save()
+    }
+
+    fun getDependantMods() = toolData.mods.filter { child -> (id != null && child.requiredIds.contains(id) || child.requiredNames.contains(name))  }
+
+    fun getRequiredMods() = requiredIds.mapNotNull { toolData.byId(it) } + requiredNames.mapNotNull { toolData.byName(it) }
+
+    fun getAllRequiredMods(depth: Int = 100): List<Mod> {
+        return getRequiredMods().flatMap { listOf(it) + it.getAllRequiredMods(depth - 1) }.toSet().toList()
+    }
 
     fun refreshPlugins() {
         if (!hasTag(Tag.EXTERNAL)) {
