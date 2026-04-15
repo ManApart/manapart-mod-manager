@@ -90,6 +90,10 @@ data class Mod(
     fun getRequiredMods() = requiredIds.mapNotNull { toolData.byId(it) } + requiredNames.mapNotNull { toolData.byName(it) }
 
     fun getAllRequiredMods(depth: Int = 100): List<Mod> {
+        if (depth <= 0){
+            println(red("Dependency chain greater than 100. Do you have a required mod loop?"))
+            return emptyList()
+        }
         return getRequiredMods().flatMap { listOf(it) + it.getAllRequiredMods(depth - 1) }.toSet().toList()
     }
 

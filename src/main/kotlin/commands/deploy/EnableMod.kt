@@ -1,5 +1,6 @@
 package commands.deploy
 
+import Mod
 import StageChange
 import commands.getIndices
 import commands.getRange
@@ -44,21 +45,21 @@ private fun enableMod(enable: Boolean = true, args: List<String>) {
 }
 
 private fun enableList(enable: Boolean, args: List<String>) {
-    val names = args.getIndices(toolData.mods.size).mapNotNull { i ->
+    val names = args.getIndices(toolData.mods.size).flatMap { i ->
         enableMod(enable, i)
     }.joinToString(", ")
     save()
-    if (enable) println(cyan("Enabled")+ " $names") else println(cyan("Disabled")+ " $names")
+    if (enable) println(cyan("Enabled") + " $names") else println(cyan("Disabled") + " $names")
 }
 
-fun enableMod(enable: Boolean, i: Int): String? {
-    val mod = toolData.mods[i]
+fun enableMod(enable: Boolean, i: Int) = enableMod(enable, toolData.mods[i])
+fun enableMod(enable: Boolean, mod: Mod, enableChildren: Boolean = true): List<String> {
     return if (enable && detectStagingChanges(File(mod.filePath)) == StageChange.FOMOD) {
-        println("$i ${yellow(mod.name)} cannot be enabled because it is an unprocessed fomod. Delete the fomod folder in the staging folder to enable. (And pick your options).")
-        null
+        println("${mod.index} ${yellow(mod.name)} cannot be enabled because it is an unprocessed fomod. Delete the fomod folder in the staging folder to enable. (And pick your options).")
+        emptyList()
     } else {
         mod.enabled = enable
-        mod.name
+        listOf(mod.name) + (if (enableChildren) mod.getAllRequiredMods().flatMap { enableMod(enable, it, false) } else emptyList())
     }
 }
 
@@ -69,6 +70,6 @@ private fun enableRange(enable: Boolean, args: List<String>) {
             enableMod(enable, i)
         }.joinToString(", ")
         save()
-        if (enable) println(cyan("Enabled")+ " $names") else println(cyan("Disabled")+ " $names")
+        if (enable) println(cyan("Enabled") + " $names") else println(cyan("Disabled") + " $names")
     }
 }
