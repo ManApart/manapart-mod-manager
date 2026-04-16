@@ -64,6 +64,14 @@ fun setModOrder(mods: List<Mod>, modIndex: Int, position: Int) {
         println(red("No mod found at $modIndex"))
         return
     }
+    mod.getRequiredMods().firstOrNull { it.loadOrder > position }?.let {
+        println(red("${it.indexName()} (${it.loadOrder}) is required and can't load AFTER ${mod.indexName()} ($position)"))
+        return
+    }
+    mod.getDependantMods().firstOrNull { it.loadOrder < position }?.let {
+        println(red("${it.indexName()} (${it.loadOrder}) is requires ${mod.indexName()} ($position) and can't be loaded BEFORE it"))
+        return
+    }
     println("Setting mod $modIndex at position ${mod.loadOrder} to position $position")
     val oldOrder = mod.loadOrder
     mods.filter { it.loadOrder > oldOrder }.forEach { it.loadOrder -= 1 }
