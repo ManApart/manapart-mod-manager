@@ -80,6 +80,7 @@ fun List<Mod>.validate() {
     modsWithFiles.noSubDirectories(errorMap, helpMessages)
     detectBadUE4Mods(errorMap, helpMessages)
     checkPlugins(errorMap, helpMessages)
+    requiredSortOrder(errorMap)
 
     if (gameMode == GameMode.STARFIELD) {
         checkCreations(nonModErrors, helpMessages, creationCatalog)
@@ -292,6 +293,17 @@ private fun Map<Mod, List<File>>.addEmptyEnabled(
     filter { it.key.enabled && it.value.isEmpty() }.forEach { (mod, _) ->
         errorMap.putIfAbsent(mod.index, mod to mutableListOf())
         errorMap[mod.index]?.second?.add("Enabled but not installed")
+    }
+}
+
+private fun List<Mod>.requiredSortOrder(
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
+) {
+    forEach { mod ->
+        mod.getRequiredMods().filter { it.loadOrder >= mod.loadOrder }.forEach { req ->
+            errorMap.putIfAbsent(mod.index, mod to mutableListOf())
+            errorMap[mod.index]?.second?.add("Requires ${req.indexName()} which loads after it")
+        }
     }
 }
 
