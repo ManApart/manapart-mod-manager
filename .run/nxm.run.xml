@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="nxm" type="JetRunConfigurationType">
+    <envs>
+      <env name="MMM_HOME" value="." />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="MainKt" />
+    <module name="manapart-mod-manager.main" />
+    <option name="PROGRAM_PARAMETERS" value="nxm://starfield/mods/13139/files/57030?key=GT0BoePIwsiV_Uwr9-2VqQ&amp;expires=1775648122&amp;user_id=1398716" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

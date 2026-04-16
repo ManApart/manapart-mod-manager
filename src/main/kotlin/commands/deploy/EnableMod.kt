@@ -66,7 +66,7 @@ fun enableMod(enable: Boolean, mod: Mod, enableChildren: Boolean = true): List<S
 private fun enableRange(enable: Boolean, args: List<String>) {
     val range = args.getRange(toolData.mods.size)
     if (range.isNotEmpty()) {
-        val names = range.mapNotNull { i ->
+        val names = range.map { i ->
             enableMod(enable, i)
         }.joinToString(", ")
         save()

@@ -1,5 +1,5 @@
-import commands.edit.Tag
 import commands.deploy.espTypes
+import commands.edit.Tag
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.io.File
@@ -50,6 +50,8 @@ data class Mod(
     fun idName(): String {
         return if (id == null) name else "$id $name"
     }
+
+    fun indexName() = "$index $name"
 
     fun description(): String {
         return "$index (${id ?: "?"}) $name"

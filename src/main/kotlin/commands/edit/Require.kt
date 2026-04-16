@@ -1,6 +1,7 @@
 package commands.edit
 
 import Mod
+import red
 import toolData
 
 val requireDescription = """
@@ -45,23 +46,30 @@ fun require(command: String, args: List<String>) {
 private fun printRequirements(mod: Mod) {
     val mods = mod.getRequiredMods()
     if (mods.isEmpty()) println("${mod.name} doesn't require any mods") else {
-        println(mod.name + " requires")
-        println("\t" + mods.joinToString("\n\t") { it.idName() })
+        println(mod.indexName())
+        println("\t" + mods.joinToString("\n\t") { it.indexName() })
     }
 }
 
 private fun printAllRequirements(mod: Mod) {
-    val mods = mod.getAllRequiredMods()
-    if (mods.isEmpty()) println("${mod.name} doesn't require any mods") else {
-        println(mod.name + " requires (all)")
-        println("\t" + mods.joinToString("\n\t") { it.idName() })
+    if (mod.getRequiredMods().isEmpty()) println("${mod.name} doesn't require any mods") else {
+        printAllRequirements(mod, 0)
     }
+}
+
+private fun printAllRequirements(mod: Mod, depth: Int) {
+    if (depth > 100) {
+        println(red("Dependency chain greater than 100. Do you have a required mod loop?"))
+        return
+    }
+    println("\t".repeat(depth) + mod.indexName())
+    mod.getRequiredMods().forEach { printAllRequirements(it, depth + 1) }
 }
 
 private fun printChildren(mod: Mod) {
     val mods = mod.getDependantMods()
     if (mods.isEmpty()) println("${mod.name} isn't needed by any mods") else {
-        println(mod.name + " is depended on by")
-        println("\t" + mods.joinToString("\n\t") { it.idName() })
+        println(mod.indexName())
+        println("\t" + mods.joinToString("\n\t") { it.indexName() })
     }
 }
