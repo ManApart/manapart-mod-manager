@@ -47,29 +47,46 @@ private fun printRequirements(mod: Mod) {
     val mods = mod.getRequiredMods()
     if (mods.isEmpty()) println("${mod.name} doesn't require any mods") else {
         println(mod.indexName())
-        println("\t" + mods.joinToString("\n\t") { it.indexName() })
+        mods.forEachIndexed { i, req ->
+            printRequirements(req, i == mods.lastIndex, 1, " ", false)
+        }
     }
 }
 
 private fun printAllRequirements(mod: Mod) {
     if (mod.getRequiredMods().isEmpty()) println("${mod.name} doesn't require any mods") else {
-        printAllRequirements(mod, 0)
+        println(mod.indexName())
+        val children = mod.getRequiredMods()
+        children.forEachIndexed { i, req ->
+            printRequirements(req, i == children.lastIndex, 1)
+        }
     }
 }
 
-private fun printAllRequirements(mod: Mod, depth: Int) {
+private fun printRequirements(mod: Mod, isLast: Boolean, depth: Int, prefix: String = " ", recursive: Boolean = true) {
     if (depth > 100) {
         println(red("Dependency chain greater than 100. Do you have a required mod loop?"))
         return
     }
-    println("\t".repeat(depth) + mod.indexName())
-    mod.getRequiredMods().forEach { printAllRequirements(it, depth + 1) }
+    val branch = if (isLast) "└─ " else "├─ "
+    println(prefix + branch + mod.indexName())
+    if (recursive) {
+        val mods = mod.getRequiredMods()
+        val childPrefix = prefix + if (isLast) "    " else "│   "
+        mods.forEachIndexed { index, req ->
+            printRequirements(req, index == mods.lastIndex, depth + 1, childPrefix)
+        }
+    }
 }
 
 private fun printChildren(mod: Mod) {
     val mods = mod.getDependantMods()
     if (mods.isEmpty()) println("${mod.name} isn't needed by any mods") else {
         println(mod.indexName())
-        println("\t" + mods.joinToString("\n\t") { it.indexName() })
+        mods.forEachIndexed { i, child ->
+            val isLast = i == mods.lastIndex
+            val branch = if (isLast) " └─ " else " ├─ "
+            println(branch + child.indexName())
+        }
     }
 }
