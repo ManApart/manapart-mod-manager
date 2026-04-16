@@ -81,6 +81,7 @@ fun List<Mod>.validate() {
     detectBadUE4Mods(errorMap, helpMessages)
     checkPlugins(errorMap, helpMessages)
     requiredSortOrder(errorMap)
+    recursiveRequirements(errorMap, helpMessages)
 
     if (gameMode == GameMode.STARFIELD) {
         checkCreations(nonModErrors, helpMessages, creationCatalog)
@@ -181,7 +182,9 @@ private fun List<Mod>.detectDupePlugins() {
 private fun List<Mod>.detectIncorrectCasing(
     errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
 ) {
-    val goodPaths = (gameMode.generatedPaths.values.flatMap { listOf(it.suffix, "/"+ it.suffix.split("/").takeLast(2).joinToString("/")) } + gameMode.deployedModPath).filter { it.isNotBlank() && it != "/" }.toSet()
+    val goodPaths = (gameMode.generatedPaths.values.flatMap {
+        listOf(it.suffix, "/" + it.suffix.split("/").takeLast(2).joinToString("/"))
+    } + gameMode.deployedModPath).filter { it.isNotBlank() && it != "/" }.toSet()
     forEach { mod ->
         val modsPaths = mod.getModFiles()
             .asSequence()
@@ -296,15 +299,32 @@ private fun Map<Mod, List<File>>.addEmptyEnabled(
     }
 }
 
-private fun List<Mod>.requiredSortOrder(
-    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>
-) {
+private fun List<Mod>.requiredSortOrder(errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>) {
     forEach { mod ->
         mod.getRequiredMods().filter { it.loadOrder >= mod.loadOrder }.forEach { req ->
             errorMap.putIfAbsent(mod.index, mod to mutableListOf())
             errorMap[mod.index]?.second?.add("Requires ${req.indexName()} which loads after it")
         }
     }
+}
+
+private fun List<Mod>.recursiveRequirements(
+    errorMap: MutableMap<Int, Pair<Mod, MutableList<String>>>,
+    helpMessages: MutableSet<String>
+) {
+    filter { !it.hasNoRecursiveRequirements() }.forEach { mod ->
+        errorMap.putIfAbsent(mod.index, mod to mutableListOf())
+        errorMap[mod.index]?.second?.add("Has recursive requirements!")
+        helpMessages.add("To identify recursive requirements, use req <index> all")
+    }
+}
+
+private fun Mod.hasNoRecursiveRequirements(depth: Int = 100): Boolean {
+    if (depth <= 0) {
+        return false
+    }
+    val next = getRequiredMods()
+    return next.isEmpty() || next.all { it.hasNoRecursiveRequirements(depth - 1) }
 }
 
 private fun printErrors(errorMap: Map<Int, Pair<Mod, MutableList<String>>>) {
