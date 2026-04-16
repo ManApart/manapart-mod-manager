@@ -37,7 +37,7 @@ fun require(command: String, args: List<String>) {
             println("${mod.name} now requires ${other.idName()}")
         }
 
-        subCommand == "remove" -> {
+        subCommand == "remove" || subCommand == "rm" -> {
             mod.removeRequired(other)
             println("${mod.name} no longer requires ${other.idName()}")
         }

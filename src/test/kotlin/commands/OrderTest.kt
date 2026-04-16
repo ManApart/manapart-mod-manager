@@ -1,11 +1,13 @@
 package commands
 
+import Data
 import GameConfig
 import Mod
 import commands.deploy.setModOrder
 import gameConfig
 import org.junit.jupiter.api.BeforeAll
 import testingMode
+import toolData
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,6 +16,7 @@ class OrderTest {
         @JvmStatic
         @BeforeAll
         fun setup() {
+            toolData = Data()
             testingMode = true
             gameConfig = GameConfig()
         }

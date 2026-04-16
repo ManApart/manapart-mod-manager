@@ -68,25 +68,23 @@ fun esp(command: String, args: List<String>) {
         }
     with(arguments) {
         val mods = getModsWithPlugins()
-        when {
-            subCommand == "first" -> setModOrder(toolData.mods, index, 0)
-            subCommand == "last" -> setModOrder(toolData.mods, index, toolData.nextLoadOrder())
-            subCommand == "set" && amount != null -> setModOrder(toolData.mods, index, amount)
-            subCommand == "sooner" && amount != null -> setModOrder(
-                toolData.mods,
-                index,
+        when (subCommand) {
+            "first" -> setModOrder(toolData.mods, index, 0)
+            "last" -> setModOrder(toolData.mods, index, toolData.nextLoadOrder())
+            "set" if amount != null -> setModOrder(toolData.mods, index, amount)
+            "sooner" if amount != null -> setModOrder(
+                toolData.mods, index,
                 nextPluginLoadOrder(mods, index, -amount)
             )
 
-            subCommand == "later" && amount != null -> setModOrder(
-                toolData.mods,
-                index,
+            "later" if amount != null -> setModOrder(
+                toolData.mods, index,
                 nextPluginLoadOrder(mods, index, amount)
             )
 
-            subCommand == "sooner" -> setModOrder(toolData.mods, index, nextPluginLoadOrder(mods, index, -1))
-            subCommand == "later" -> setModOrder(toolData.mods, index, nextPluginLoadOrder(mods, index, 1))
-            subCommand == "sub" -> setSubOrder(index, amount ?: 0, args.last().toIntOrNull() ?: 0)
+            "sooner" -> setModOrder(toolData.mods, index, nextPluginLoadOrder(mods, index, -1))
+            "later" -> setModOrder(toolData.mods, index, nextPluginLoadOrder(mods, index, 1))
+            "sub" -> setSubOrder(index, amount ?: 0, args.last().toIntOrNull() ?: 0)
             else -> println("Unknown subCommand: ")
         }
         display(getModsWithPlugins())
