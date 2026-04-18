@@ -82,7 +82,8 @@ fun config(command: String, args: List<String>) {
         }
 
         args.size == 2 && args.first() == "api-key" -> {
-            toolConfig.apiKey = args.last()
+            val key = lastFullInput.split(" ").last()
+            toolConfig.apiKey = key
             println("Updated api key to ${toolConfig.apiKey}")
             save()
         }
