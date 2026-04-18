@@ -44,7 +44,7 @@ fun searchMods(command: String, args: List<String> = listOf()) {
 fun searchMods(persist: Boolean, args: List<String> = listOf()) {
     if (args.firstOrNull() == "all" || args.firstOrNull() == "clear") {
         if (persist) toolData.mods.forEach { it.show = true }
-        display(toolData.mods.map { it to true })
+        display(toolData.mods)
         return
     }
     if (args.contains("fomod")) searchFomods(persist) else {
@@ -83,7 +83,7 @@ fun searchMods(persist: Boolean, args: List<String> = listOf()) {
             if (persist) mod.show = displayed
             mod to displayed
         }
-        display(mods)
+        displayShown(mods)
     }
 }
 
@@ -126,5 +126,5 @@ private fun searchFomods(persist: Boolean) {
         if (persist) mod.show = displayed
         mod to displayed
     }
-    display(mods)
+    displayShown(mods)
 }

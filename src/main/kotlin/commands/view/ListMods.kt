@@ -17,22 +17,30 @@ val listDescription = """
     List Mod details
     You can give a start and amount if you want to list just a subsection
     list 10 30 would list 30 mods, starting with the 10th mod
+    list load will sort mods by load order instead of index
 """.trimIndent()
 
 val listUsage = """
     List
     list <start> <amount>
+    List load
 """.trimIndent()
+
+enum class ListSort(val comparator: (Mod) -> Int) {
+    INDEX({ it.index }),
+    LOAD({ it.loadOrder }),
+}
 
 fun listMods(command: String, args: List<String> = listOf()) {
     val ranges = args.mapNotNull { it.toIntOrNull() }
+    val sort = if (args.contains("load")) ListSort.LOAD else ListSort.INDEX
     when {
-        ranges.isNotEmpty() -> displayAmount(ranges)
-        else -> display(toolData.mods.map { it to it.show })
+        ranges.isNotEmpty() -> displayAmount(ranges, sort)
+        else -> displayShown(toolData.mods.map { it to it.show }, sort)
     }
 }
 
-private fun displayAmount(ranges: List<Int>) {
+private fun displayAmount(ranges: List<Int>, sort: ListSort) {
     val start = ranges.first()
     val amount = ranges.getOrNull(1) ?: 20
     var shownCount = 0
@@ -43,10 +51,11 @@ private fun displayAmount(ranges: List<Int>) {
         } else false
         mod to shown
     }
-    display(shownMods)
+    displayShown(shownMods, sort)
 }
 
-fun display(mods: List<Pair<Mod, Boolean>>) {
+fun displayShown(mods: List<Pair<Mod, Boolean>>, sort: ListSort = ListSort.INDEX) = display(mods.filter { it.second }.map { it.first }, sort)
+fun display(mods: List<Mod>, sort: ListSort = ListSort.INDEX) {
     clearConsole()
     val columns = listOf(
         Column("Id", 7),
@@ -58,7 +67,7 @@ fun display(mods: List<Pair<Mod, Boolean>>) {
         Column("Name", 60),
         Column("Tags", 30),
     )
-    val data = mods.map { (mod, displayed) ->
+    val data = mods.sortedBy(sort.comparator).map { mod ->
         with(mod) {
             val enabledCheck = if (enabled) ENABLED else "  "
             val endorsedCheck = when (endorsed) {
@@ -85,7 +94,7 @@ fun display(mods: List<Pair<Mod, Boolean>>) {
                 "Name" to name,
                 "Tags" to tags.joinToString(", "),
             )
-        } to displayed
-    }.filter { it.second }.map { it.first }
+        }
+    }
     Table(columns, data).print()
 }
