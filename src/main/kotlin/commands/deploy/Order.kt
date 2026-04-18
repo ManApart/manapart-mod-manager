@@ -3,9 +3,9 @@ package commands.deploy
 import Column
 import Mod
 import Table
+import cyan
 import red
 import save
-import sun.util.calendar.CalendarUtils.mod
 import toolData
 
 val orderDescription = """
@@ -91,6 +91,41 @@ fun setModOrder(mods: List<Mod>, modIndex: Int, position: Int) {
 }
 
 private fun optimizeMods(dryRun: Boolean) {
+    removeOrderGaps(dryRun)
+    optimizeRequirements(dryRun)
+}
+
+private fun removeOrderGaps(dryRun: Boolean) {
+    val columns = listOf(
+        Column("Index", 7),
+        Column("Current Load", 15),
+        Column("New Load", 15),
+        Column("Name", 60),
+    )
+    val data = mutableListOf<Map<String, Any>>()
+    val mods = toolData.mods.sortedBy { it.loadOrder }
+    mods.firstOrNull()?.loadOrder = 0
+    mods.drop(1).forEachIndexed { i, mod ->
+        val previous = mods[i]
+        val pos = previous.loadOrder + 1
+        if (mod.loadOrder == pos) return@forEachIndexed
+        data.add(
+            mapOf(
+                "Index" to mod.index,
+                "Current Load" to mod.loadOrder,
+                "New Load" to pos,
+                "Name" to mod.name,
+            )
+        )
+        if (!dryRun) {
+            setModOrder(toolData.mods, mod.index, pos)
+        }
+    }
+    println(cyan("Remove order gaps:"))
+    Table(columns, data).print()
+}
+
+private fun optimizeRequirements(dryRun: Boolean) {
     val columns = listOf(
         Column("Index", 7),
         Column("Current Load", 15),
@@ -105,16 +140,19 @@ private fun optimizeMods(dryRun: Boolean) {
         val req = reqs.maxBy { it.loadOrder }
         val pos = req.loadOrder + 1
         if (mod.loadOrder == pos) return@forEach
-        data.add(mapOf(
-            "Index" to mod.index,
-            "Current Load" to mod.loadOrder,
-            "New Load" to pos,
-            "Name" to mod.name,
-            "After" to req.name
-        ))
+        data.add(
+            mapOf(
+                "Index" to mod.index,
+                "Current Load" to mod.loadOrder,
+                "New Load" to pos,
+                "Name" to mod.name,
+                "After" to req.name
+            )
+        )
         if (!dryRun) {
             setModOrder(toolData.mods, mod.index, pos)
         }
     }
+    println("\n" + cyan("Order per required mods:"))
     Table(columns, data).print()
 }
