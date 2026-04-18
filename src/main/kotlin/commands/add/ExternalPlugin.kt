@@ -12,6 +12,7 @@ import yellow
 import java.io.File
 import java.nio.file.Files
 import GamePath.*
+import argsWithCaps
 import commands.edit.Tag
 import commands.deploy.espTypes
 import logFetch
@@ -73,16 +74,17 @@ private fun addAllExternal() {
 
 fun addExternal(esp: String, name: String? = null) {
     val mods = getExternalMods()
-    val cleanKey = mods.keys.firstOrNull { it.lowercase().split(".")[0] == esp.lowercase() }
+    val espKey = esp.lowercase().split(".").first()
+    val cleanKey = mods.keys.firstOrNull { it.lowercase().split(".").first() == espKey }
     if (cleanKey == null) {
         println("Could not find $esp")
         return
     }
-    if (mods[esp] != null) {
-        println("Mod already managed as ${mods[esp]?.description()}")
+    if (mods[espKey] != null) {
+        println("Mod already managed as ${mods[espKey]?.description()}")
         return
     }
-    val usedName = (name ?: esp).lowercase()
+    val usedName = (name ?: espKey).lowercase()
 
     val loadOrder = toolData.nextLoadOrder()
     val stagePath = modFolder.path + "/" + usedName.replace(" ", "-")

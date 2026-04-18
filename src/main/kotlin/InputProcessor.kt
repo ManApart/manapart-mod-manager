@@ -2,12 +2,16 @@ import commands.CommandType
 import commands.getCommand
 
 var lastFullInput = ""
+var argsWithCaps = listOf<String>()
 
 fun readLine(line: String?) = line?.split(" & ")?.forEach { readCommand(it) }
 
 fun readCommand(line: String) {
-    val parts = line.parseArgs().map { it.lowercase() }
     lastFullInput = line
+    val rawArgs = line.parseArgs()
+    argsWithCaps = rawArgs.drop(1)
+
+    val parts = rawArgs.map { it.lowercase() }
     when {
         parts.isEmpty() -> CommandType.HELP.usage
         parts.size == 1 && parts.first().startsWith("nxm://") -> addModByNexusProtocol(line)
