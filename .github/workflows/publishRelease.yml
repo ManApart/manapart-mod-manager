@@ -43,4 +43,4 @@ jobs:
           filename: mod-manager.zip
           display_name: "Manapart Mod Manager"
           description: "CLI Mod Manager"
-          version: ${{ github.event.release.tag_name || github.event.inputs.version }}
+          version: ${{ github.event.release.tag_name || github.event.inputs.version ||  github.ref_name }}
