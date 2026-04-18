@@ -32,3 +32,15 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: ./build/libs/manapart-mod-manager.jar,./app/mmm.desktop
+      - name: Zip files
+        run: zip -r mod-manager.zip build/libs/manapart-mod-manager.jar app/mmm.desktop
+      - name: Upload mod to NexusMods
+        id: upload
+        uses: Nexus-Mods/upload-action@main
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_group_id: ${{ vars.NEXUSMODS_FILE_GROUP_ID }}
+          filename: mod-manager.zip
+          display_name: "Manapart Mod Manager"
+          description: "CLI Mod Manager"
+          version: ${{ github.event.release.tag_name || github.event.inputs.version }}
