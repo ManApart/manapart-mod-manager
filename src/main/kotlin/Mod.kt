@@ -87,12 +87,14 @@ data class Mod(
         save()
     }
 
-    fun getDependantMods() = toolData.mods.filter { child -> (id != null && child.requiredIds.contains(id) || child.requiredNames.contains(name))  }
+    fun getDependantMods() = toolData.mods.filter { child -> (id != null && child.requiredIds.contains(id) || child.requiredNames.contains(name)) }
+
+    fun hasRequiredMods() = requiredIds.isNotEmpty() || requiredNames.isNotEmpty()
 
     fun getRequiredMods() = requiredIds.mapNotNull { toolData.byId(it) } + requiredNames.mapNotNull { toolData.byName(it) }
 
     fun getAllRequiredMods(depth: Int = 100): List<Mod> {
-        if (depth <= 0){
+        if (depth <= 0) {
             println(red("Dependency chain greater than 100. Do you have a required mod loop?"))
             return emptyList()
         }

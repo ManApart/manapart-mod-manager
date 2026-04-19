@@ -9,11 +9,13 @@ val requireDescription = """
     When a mod is enabled, any required mods are also enabled
     When a mod is disabled, any mods depending on that mod are also disabled
     require lists direct requirements of this mod
-    require all lists requirements recursively so you can see the full tree
+    require all lists all mods that have requirements and their first level required
+    require <index> all lists requirements recursively so you can see the full tree
     require child shows children who require this mod
 """.trimIndent()
 
 val requireUsage = """
+    require all
     require <index>
     require <index> all
     require <index> child
@@ -26,7 +28,9 @@ fun require(command: String, args: List<String>) {
     val other = args.lastOrNull()?.toIntOrNull()?.let { toolData.byIndex(it) }
     val subCommand = args.firstOrNull { it.toIntOrNull() == null }
     when {
-        args.isEmpty() || mod == null -> println("Specify the index of a mod to see requirements")
+        args.isEmpty() -> println("Specify the index of a mod to see requirements")
+        args.first() == "all" -> printAllRequirements()
+        mod == null -> println("Specify the index of a mod to see requirements")
         subCommand == "all" -> printRequirements(mod, true)
         subCommand == "child" && args.contains("all") -> printChildren(mod, true)
         subCommand == "child" -> printChildren(mod, false)
@@ -42,6 +46,10 @@ fun require(command: String, args: List<String>) {
             println("${mod.name} no longer requires ${other.idName()}")
         }
     }
+}
+
+private fun printAllRequirements() {
+    toolData.mods.filter { it.hasRequiredMods() }.forEach { printRequirements(it, false) }
 }
 
 private fun printRequirements(mod: Mod, all: Boolean) {
