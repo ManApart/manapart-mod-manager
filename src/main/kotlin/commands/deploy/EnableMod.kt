@@ -59,7 +59,13 @@ fun enableMod(enable: Boolean, mod: Mod, enableChildren: Boolean = true): List<S
         emptyList()
     } else {
         mod.enabled = enable
-        listOf(mod.name) + (if (enableChildren) mod.getAllRequiredMods().flatMap { enableMod(enable, it, false) } else emptyList())
+        if (enable){
+            //Enable ALL required mods in one go, don't recursively do it
+            listOf(mod.name) + (if (enableChildren) mod.getAllRequiredMods().flatMap { enableMod(true, it, false) } else emptyList())
+        } else {
+            //Disable all children, recursively
+            listOf(mod.name) + (mod.getDependantMods().flatMap { enableMod(false, it) })
+        }
     }
 }
 
