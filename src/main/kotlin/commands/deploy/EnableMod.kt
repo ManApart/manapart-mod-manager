@@ -7,7 +7,6 @@ import commands.getRange
 import cyan
 import detectStagingChanges
 import save
-import toolConfig
 import toolData
 import yellow
 import java.io.File
@@ -41,7 +40,7 @@ private fun enableMod(enable: Boolean = true, args: List<String>) {
         args.size == 1 && args.first() == "all" -> enableRange(enable, listOf("0-${toolData.mods.size - 1}"))
         else -> enableList(enable, args)
     }
-    if (args.isNotEmpty() && toolConfig.autoDeploy) deploy("", listOf())
+    if (args.isNotEmpty()) autoDeploy()
 }
 
 private fun enableList(enable: Boolean, args: List<String>) {

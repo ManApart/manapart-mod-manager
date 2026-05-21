@@ -2,10 +2,12 @@ package commands.deploy
 
 import Mod
 import PathType
+import com.sun.tools.javac.tree.TreeInfo.args
 import commands.deploy.addModFiles
 import cyan
 import gameConfig
 import gameMode
+import toolConfig
 import toolData
 import verbose
 import yellow
@@ -26,7 +28,11 @@ val deployUsage = """
     deploy dryrun
 """.trimIndent()
 
-fun deploy(command: String, args: List<String>) {
+fun autoDeploy() {
+    if (toolConfig.autoDeploy) deploy()
+}
+
+fun deploy(command: String = "", args: List<String> = listOf()) {
     val files = getAllModFiles(true)
     when {
         args.firstOrNull() == "dryrun" -> deployDryRun(files)

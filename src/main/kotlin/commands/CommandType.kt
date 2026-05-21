@@ -24,6 +24,7 @@ enum class CommandType(
     CONFIG("Edit Configuration", Category.CONFIG, configDescription, configUsage, ::config, "c"),
     CLI("Open local mod folder in terminal", Category.OPEN, openCliDescription, cliUsage, ::open, "terminal", "term"),
     CREATION("Manage Creation", Category.ADD, creationDescription, creationUsage, ::creation, "creations", "cr"),
+    BISECT("Bisect enabled Mods", Category.DEPLOY, bisectDescription, bisectUsage, ::bisect, "bi"),
     DEPLOY("Deploy enabled mods", Category.DEPLOY, deployDescription, deployUsage, ::deploy, "d"),
     DETAIL("View all details of mod", Category.VIEW, detailDescription, detailUsage, ::detailMod, "dd", "show", "view"),
     DISABLE("Disable Mod", Category.DEPLOY, enableDescription, disableUsage, ::disable, "x"),
