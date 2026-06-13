@@ -27,6 +27,7 @@ private fun searchPlugins(args: List<String>) {
         .filter { it.second.isNotEmpty() }
         .sortedBy { it.first.index }
         .also { if (it.isEmpty()) println("No plugins found") }
+        .also { mods -> BUFFER = mods.map { it.first }.toSet() }
         .forEach { (mod, matches) ->
             println("${mod.index} ${cyan(mod.name)} (${matches.size} matches)")
             matches.forEach { println("\t$it") }
@@ -39,6 +40,7 @@ private fun searchFiles(args: List<String>) {
         .filter { it.second.isNotEmpty() }
         .sortedBy { it.first.index }
         .also { if (it.isEmpty()) println("No files found") }
+        .also { mods -> BUFFER = mods.map { it.first }.toSet() }
         .forEach { (mod, matches) ->
             println("${mod.index} ${cyan(mod.name)} (${matches.size} matches)")
             matches.forEach { println("\t$it") }

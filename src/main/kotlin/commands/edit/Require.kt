@@ -1,6 +1,7 @@
 package commands.edit
 
 import Mod
+import commands.view.BUFFER
 import red
 import toolData
 
@@ -28,7 +29,7 @@ fun require(command: String, args: List<String>) {
     val other = args.lastOrNull()?.toIntOrNull()?.let { toolData.byIndex(it) }
     val subCommand = args.firstOrNull { it.toIntOrNull() == null }
     when {
-        args.isEmpty() -> println("Specify the index of a mod to see requirements")
+        args.isEmpty() -> println(requireDescription)
         args.first() == "all" -> printAllRequirements()
         mod == null -> println("Specify the index of a mod to see requirements")
         subCommand == "all" -> printRequirements(mod, true)
@@ -54,6 +55,7 @@ private fun printAllRequirements() {
 
 private fun printRequirements(mod: Mod, all: Boolean) {
     val mods = mod.getRequiredMods()
+    BUFFER = mods.toSet()
     if (mods.isEmpty()) println("${mod.name} doesn't require any mods") else {
         println(mod.indexName())
         mods.forEachIndexed { i, req ->
@@ -71,6 +73,7 @@ private fun printRequirements(mod: Mod, isLast: Boolean, depth: Int, prefix: Str
     println(prefix + branch + mod.indexName())
     if (recursive) {
         val mods = mod.getRequiredMods()
+        BUFFER = BUFFER + mods.toSet()
         val childPrefix = prefix + if (isLast) "    " else "│   "
         mods.forEachIndexed { index, req ->
             printRequirements(req, index == mods.lastIndex, depth + 1, childPrefix)
@@ -80,6 +83,7 @@ private fun printRequirements(mod: Mod, isLast: Boolean, depth: Int, prefix: Str
 
 private fun printChildren(mod: Mod, all: Boolean) {
     val mods = mod.getDependantMods()
+    BUFFER = mods.toSet()
     if (mods.isEmpty()) println("${mod.name} isn't needed by any mods") else {
         println(mod.indexName())
         mods.forEachIndexed { i, child ->
@@ -97,6 +101,7 @@ private fun printChildren(mod: Mod, isLast: Boolean, depth: Int, prefix: String 
     println(prefix + branch + mod.indexName())
     if (recursive) {
         val mods = mod.getDependantMods()
+        BUFFER = BUFFER + mods.toSet()
         val childPrefix = prefix + if (isLast) "    " else "│   "
         mods.forEachIndexed { index, req ->
             printChildren(req, index == mods.lastIndex, depth + 1, childPrefix)

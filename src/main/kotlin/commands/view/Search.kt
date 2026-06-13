@@ -83,6 +83,7 @@ fun searchMods(persist: Boolean, args: List<String> = listOf()) {
             if (persist) mod.show = displayed
             mod to displayed
         }
+        BUFFER = mods.filter { it.second }.map { it.first }.toSet()
         displayShown(mods)
     }
 }

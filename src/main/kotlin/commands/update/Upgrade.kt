@@ -2,6 +2,7 @@ package commands.update
 
 import Mod
 import addModById
+import commands.view.BUFFER
 import commands.view.displayShown
 import cyan
 import doCommand
@@ -24,6 +25,7 @@ fun upgrade(command: String, args: List<String>) {
     if (args.isEmpty()) {
         println(upgradeDescription + "\n")
         val updatable = toolData.mods.map { it to it.updateAvailable() }
+        BUFFER = updatable.filter { it.second }.map { it.first }.toSet()
         displayShown(updatable)
     } else {
         doCommand(args, List<Mod>::upgradeMods)

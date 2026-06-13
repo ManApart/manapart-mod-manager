@@ -51,6 +51,7 @@ private fun displayAmount(ranges: List<Int>, sort: ListSort) {
         } else false
         mod to shown
     }
+    BUFFER = shownMods.filter { it.second }.map { it.first }.toSet()
     displayShown(shownMods, sort)
 }
 
