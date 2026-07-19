@@ -26,7 +26,7 @@ private val client = HttpClient {
 }
 
 fun parseDownloadRequest(url: String): DownloadRequest {
-    if (!url.contains("&expires=")){
+    if (!url.contains("&expires=")) {
         throw IllegalArgumentException("Url was unable to be parsed: $url")
     }
     val modId = url.between("mods/", "/").toInt()
@@ -87,6 +87,18 @@ suspend fun getDownloadUrl(apiKey: String, downloadRequest: DownloadRequest): St
     }
 }
 
+suspend fun getModFileInfo(apiKey: String, modId: Int, fileId: Int): ModFileInfoFile? {
+    return try {
+        client.get("https://api.nexusmods.com/v1/games/${gameMode.urlName}/mods/$modId/files/$fileId.json") {
+            commonHeaders(apiKey)
+        }.body()
+    } catch (e: Exception) {
+        println(e.message ?: "")
+        verbose(e.stackTraceToString())
+        null
+    }
+}
+
 suspend fun getDownloadUrl(apiKey: String, modId: Int, fileId: Int): String? {
     return try {
         val links: List<DownloadLink> =
@@ -99,13 +111,6 @@ suspend fun getDownloadUrl(apiKey: String, modId: Int, fileId: Int): String? {
         verbose(e.stackTraceToString())
         null
     }
-}
-
-fun parseFileExtension(url: String): String {
-    val namePart = url.split("/").last()
-    val start = namePart.indexOf(".")
-    val end = namePart.indexOf("?", start)
-    return namePart.substring(start, end)
 }
 
 fun downloadMod(initialUrl: String, destination: String, forceRedownload: Boolean = false): File? {

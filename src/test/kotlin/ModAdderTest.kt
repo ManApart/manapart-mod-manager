@@ -8,8 +8,8 @@ class ModAdderTest {
     @Test
     fun basicPrimaryFile(){
         val input = ModFileInfo(listOf(
-            ModFileInfoFile(1, "1", "0.1", false),
-            ModFileInfoFile(2, "2", "0.0.1", true),
+            ModFileInfoFile(1, "1", "1.zip","0.1", false),
+            ModFileInfoFile(2, "2", "1.zip", "0.0.1", true),
         ))
         val actual = input.getPrimaryFile()
         assertEquals(2, actual)
@@ -18,7 +18,7 @@ class ModAdderTest {
     @Test
     fun singleFile(){
         val input = ModFileInfo(listOf(
-            ModFileInfoFile(1, "1", "0.1", false),
+            ModFileInfoFile(1, "1", "1.zip", "0.1", false),
         ))
         val actual = input.getPrimaryFile()
         assertEquals(1, actual)
@@ -27,8 +27,8 @@ class ModAdderTest {
     @Test
     fun versionFallback(){
         val input = ModFileInfo(listOf(
-            ModFileInfoFile(1, "1", "0.0.1", false),
-            ModFileInfoFile(2, "2", "0.0.2", false),
+            ModFileInfoFile(1, "1", "1.zip", "0.0.1", false),
+            ModFileInfoFile(2, "2", "2.zip", "0.0.2", false),
         ))
         val actual = input.getPrimaryFile()
         assertEquals(2, actual)
@@ -37,8 +37,8 @@ class ModAdderTest {
     @Test
     fun majorBeatsMinor(){
         val input = ModFileInfo(listOf(
-            ModFileInfoFile(1, "1", "1.0.1", false),
-            ModFileInfoFile(2, "2", "0.0.2", false),
+            ModFileInfoFile(1, "1", "1.zip", "1.0.1", false),
+            ModFileInfoFile(2, "2", "2.zip", "0.0.2", false),
         ))
         val actual = input.getPrimaryFile()
         assertEquals(1, actual)

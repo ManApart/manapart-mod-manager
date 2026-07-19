@@ -42,12 +42,13 @@ private fun downloadMod(mod: Mod, forceRedownload: Boolean, fileId: Int? = null)
     println("Downloading ${mod.id}: ${mod.name}")
     val cleanName = mod.name.replace(" ", "-")
     val downloadUrl = runBlocking { getDownloadUrl(toolConfig.apiKey!!, mod.id!!, fileId ?: mod.fileId!!) }
+    val fileInfo = runBlocking { getModFileInfo(toolConfig.apiKey!!, mod.id!!, fileId ?: mod.fileId!!) }
     verbose("Downloading with url $downloadUrl")
-    if (downloadUrl == null) {
-        println(red("Unable to get download url for ${mod.name}"))
+    if (downloadUrl == null || fileInfo == null) {
+        println(red("Unable to get download url or file info for ${mod.name}"))
         return null
     }
-    val destination = "$HOME/Downloads/${gameMode.modFolder}/$cleanName${parseFileExtension(downloadUrl)}"
+    val destination = "$HOME/Downloads/${gameMode.modFolder}/$cleanName.${fileInfo.fileExtension()}"
     return downloadMod(downloadUrl, destination, forceRedownload)
 }
 
@@ -103,9 +104,9 @@ private val versionComparator = Comparator { fileA: ModFileInfoFile, fileB: ModF
 
 fun ModFileInfo.getPrimaryFile(): Int? {
     return files.let { files ->
-        if (files.size == 1) files.first().file_id else {
-            files.firstOrNull { it.is_primary }?.file_id
-        } ?: files.sortedWith(versionComparator).firstOrNull()?.file_id
+        if (files.size == 1) files.first().fileId else {
+            files.firstOrNull { it.isPrimary }?.fileId
+        } ?: files.sortedWith(versionComparator).firstOrNull()?.fileId
     }
 }
 
@@ -125,11 +126,12 @@ fun addModByNexusProtocol(url: String) {
     save()
     println("Downloading $modName")
     val downloadUrl = runBlocking { getDownloadUrl(toolConfig.apiKey!!, request) }
-    if (downloadUrl == null) {
+    val fileInfo = runBlocking { getModFileInfo(toolConfig.apiKey!!, mod.id!!, request.fileId) }
+    if (downloadUrl == null || fileInfo == null) {
         println(red("Unable to get download url for $modName"))
         return
     }
-    val destination = "$HOME/Downloads/${gameMode.modFolder}/$cleanName${parseFileExtension(downloadUrl)}"
+    val destination = "$HOME/Downloads/${gameMode.modFolder}/$cleanName.${fileInfo.fileExtension()}"
     val downloaded = downloadMod(downloadUrl, destination)
     if (downloaded == null) {
         println(red("Failed to download ${mod.name}"))

@@ -12,14 +12,4 @@ class NexusClientTest {
 
         assertEquals(expected, actual)
     }
-
-    @Test
-    fun parseFileExtension(){
-        val actual = nexus.parseFileExtension("https://chicago-premium.nexus-cdn.com/4187/4183/Sleepy Time - Less Suggestive Wakeup Lines-4183-1-0-1695904632.zip?md5=aaaabbb0026expires=1696950578\\u0026user_id=11111")
-        val expected = ".zip"
-
-        assertEquals(expected, actual)
-    }
-
-
 }
