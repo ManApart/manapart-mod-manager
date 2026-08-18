@@ -9,14 +9,15 @@ import toolData
 import yellow
 
 enum class Tag(val tag: String) {
-    CREATION("Creation"),
-    EXTERNAL("External"),
-    SKIP_VALIDATE("Skip-Validate"),
+    CREATION("creation"),
+    EXTERNAL("external"),
+    SKIP_VALIDATE("skip-validate"),
 }
 
 val tagDescription = """
 Add and remove tags
 tag ls - Lists all tags and number of mods using that tag
+note that tags are always lower case
 """.trimIndent()
 
 val tagUsage = """
