@@ -17,6 +17,7 @@ fun purple(text: String) = "\u001B[35m$text$ANSI_RESET"
 fun cyan(text: String) = "\u001B[36m$text$ANSI_RESET"
 fun white(text: String) = "\u001B[37m$text$ANSI_RESET"
 fun grayBG(text: String) = "\u001B[100m$text$ANSI_RESET"
+fun hyperLink(text: String, url: String) = if (toolConfig.useLinks) "\u001B]8;;$url\u001B\\$text\u001B]8;;\u001B\\" else text
 
 fun File.runCommand(command: String, silent: Boolean = false, echo: Boolean = false): String? {
     val parts = command.split("\\s".toRegex())
@@ -44,7 +45,7 @@ fun File.runCommand(parts: List<String>, silent: Boolean = false, echo: Boolean 
     }
 }
 
-fun clearConsole(){
+fun clearConsole() {
     //clear screen
     print("\u001B[2J")
     //clear history

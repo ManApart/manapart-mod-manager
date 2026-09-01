@@ -22,6 +22,7 @@ val configDescription = """
     autodeploy automatically runs deploy when enabling or disabling mods. Defaults to true
     deploytarget - set the default path for mods to deploy to. Defaults to the Data directory but could be used to deploy to app data etc
     logging - log events like launch (and load order) or first time fetching a mod etc, on by default
+    uselinks - attempt to make certain output clickable, on by default. Set off if display is odd.
     categories - download game specific category names from nexus
     config path is used to set game specific paths
     config paths tells you what paths are needed
@@ -40,6 +41,7 @@ val configUsage = """
     |config autodeploy <true/false>
     |config deploytarget <PATHTYPE>
     |config logging <true/false>
+    |config uselinks <true/false>
     |config categories
     |config version
 """.trimMargin()
@@ -110,6 +112,7 @@ fun config(command: String, args: List<String>) {
         args.first() == "deploytarget" || args.first() == "dt" -> println("Deploy target options are: ${PathType.listWithAliases()}")
         args.first() == "verbose" -> updateFlag(args, toolConfig::verbose)
         args.first() == "autodeploy" -> updateFlag(args, toolConfig::autoDeploy)
+        args.first() == "uselinks" -> updateFlag(args, toolConfig::useLinks)
         args.first() == "version" -> viewAppVersion()
 
         else -> println("Unknown args: ${args.joinToString(" ")}")

@@ -9,6 +9,7 @@ import THUMBS_UP
 import Table
 import UPDATE
 import clearConsole
+import hyperLink
 import toolData
 import truncate
 import java.io.File
@@ -83,13 +84,15 @@ fun display(mods: List<Mod>, sort: ListSort = ListSort.INDEX) {
                 latestVersion != null -> "$UPDATE?"
                 else -> "  ?"
             }
-            val staged = if (File(filePath).exists()) FOLDER else "  "
+            val isStaged = File(filePath).exists()
+            val staged = if (isStaged) FOLDER else "  "
             val category = category()?.take(19) ?: "?"
+            val status = "$staged $enabledCheck $endorsedCheck".let { if (isStaged) hyperLink(it.padEnd(10), File(filePath).toURI().toString()) else it }
             mapOf(
                 "Index" to mod.index,
-                "Status" to "$staged $enabledCheck $endorsedCheck",
+                "Status" to status,
                 "Load" to loadOrder,
-                "Id" to idClean,
+                "Id" to hyperLink(idClean.padEnd(7), mod.url()),
                 "Version" to versionClean,
                 "Category" to category,
                 "Name" to name,
