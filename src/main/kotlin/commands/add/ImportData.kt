@@ -6,6 +6,7 @@ import cyan
 import jsonMapper
 import lastFullInput
 import red
+import save
 import toolData
 
 val importDescription = """
@@ -47,6 +48,7 @@ fun importData(command: String, args: List<String> = listOf()) {
                 toolData.byUniqueId(id, true)?.tags?.addAll(tags)
             }
             println(cyan("Import complete"))
+            save()
         }
     }
 }
